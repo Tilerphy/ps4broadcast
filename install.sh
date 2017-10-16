@@ -24,6 +24,7 @@ sed -i "s/sysctl -w net.ipv4.ip_forward=1//g" /etc/rc.local
 sed -i "s/iptables -t nat -A ps4broadcast --ipv4 -s 192.168.200.1 -j RETURN//g" /etc/rc.local
 sed -i "s/iptables -t nat -A ps4broadcast -p tcp -s 192.168.200.0\/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935//g" /etc/rc.local
 sed -i "s/iptables -t nat -A PREROUTING -s 192.168.200.0\/24 -j ps4broadcast//g" /etc/rc.local
+sed -i "s/iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE//g" /etc/rc.local
 #add back
 sed -i "s/exit 0/iptables -N ps4broadcast -t nat\nexit 0/g" /etc/rc.local
 sed -i "s/exit 0/ifconfig eth0:2 192.168.200.1 netmask 255.255.255.0\nexit 0/g" /etc/rc.local
@@ -31,6 +32,7 @@ sed -i "s/exit 0/sysctl -w net.ipv4.ip_forward=1\nexit 0/g" /etc/rc.local
 sed -i "s/exit 0/iptables -t nat -A ps4broadcast --ipv4 -s 192.168.200.1 -j RETURN\nexit 0/g" /etc/rc.local
 sed -i "s/exit 0/iptables -t nat -A ps4broadcast -p tcp -s 192.168.200.0\/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935\nexit 0/g" /etc/rc.local
 sed -i "s/exit 0/iptables -t nat -A PREROUTING -s 192.168.200.0\/24 -j ps4broadcast\nexit 0/g" /etc/rc.local
+sed -i "s/exit 0/iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE\nexit 0/g" /etc/rc.local
 #real do
 iptables -N ps4broadcast -t nat
 ifconfig eth0:2 192.168.200.1 netmask 255.255.255.0
@@ -38,6 +40,7 @@ sysctl -w net.ipv4.ip_forward=1
 iptables -t nat -A ps4broadcast --ipv4 -s 192.168.200.1 -j RETURN
 iptables -t nat -A ps4broadcast -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935
 iptables -t nat -A PREROUTING -s 192.168.200.0/24 -j ps4broadcast
+iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
 clear
 echo "Complete."
 echo "Set on PS4/XBOX ONE/OBS"
