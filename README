@@ -1,2 +1,64 @@
 这套脚本的作用如下：
-~ install.sh
+
+install.sh
+
+0. 需要以管理员身份来执行 sudo ./install.sh
+1. 下载 1.12.1版本的nginx 以及 nginx-rtmp-module 并且编译安装至 /usr/local/nginx
+2. 修改/etc/rc.local，以求在开机时将NAT转发以及虚拟网卡进行设置。
+解释
+
+#创建一个链ps4broadcast
+iptables -N ps4broadcast -t nat
+#创建虚拟网卡地址是192.168.200.1 掩码 255.255.255.0
+ifconfig eth0:2 192.168.200.1 netmask 255.255.255.0
+#为操作系统开启ip v4的转发功能
+sysctl -w net.ipv4.ip_forward=1
+#所有192.168.200.1发出的消息ps4broadcast全部不处理
+iptables -t nat -A ps4broadcast --ipv4 -s 192.168.200.1 -j RETURN
+#所有来源是192.168.200.0这个网段、且目的端口是1935的消息全部进行DNAT，目标是192.168.200.1:1935 也就是本机的1935端口
+iptables -t nat -A ps4broadcast -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935
+#ps4broadcast链将在PREROUTING链中发挥作用
+iptables -t nat -A PREROUTING -s 192.168.200.0/24 -j ps4broadcast
+
+主要的思路就是将本台机器创建为网关，并且所有网内机器的直播地址全部转发到本机的1935端口，本机的1935端口将会由nginx来接受，并且由nginx push到目的rtmp
+地址，比如斗鱼，熊猫，bilibili等等
+
+3. 修改/usr/local/nginx/conf/nginx.conf文件，向其中加入一行
+rtmp { include /usr/local/nginx/conf/rtmp.conf.d/*;}
+意图就是让nginx读取/usr/local/nginx/conf/rtmp.conf.d/目录下的配置文件
+
+4. 安装完成后
+请在PS4/XBOX ONE进行设置，网络设置使用手动方式，IP地址选择192.168.200.0这个网段的，比如192.168.200.55，然后掩码选择255.255.255.0
+网关是192.168.200.1，DNS随意选择，可以是114.114.114.114，也可以是你计算机最快的DNS。请不要用8.8.8.8，这个DNS早就无法使用了。
+
+
+=========================================================
+
+start.sh
+
+这个脚本需要参数，格式如下
+
+sudo ./start.sh <address> <key>
+比如斗鱼，给出的有两行，第一行是rtmp://send1a.douyu.com/live, 第二行是你的直播key： ahgjwroejgrsnfbewqewqftsdgsdgsfdsfoff
+那么请执行：
+sudo ./start.sh "rtmp://send1a.douyu.com/live" "ahgjwroejgrsnfbewqew=qftsdgsdgsfdsf=off"
+一定要注意每个参数都用双引号括起来，因为两个参数都有shell中的特殊字符。
+
+然后执行
+sudo lsof -i:1935
+如果你的linux系统没有lsof命令，请安装 sudo apt-get install lsof
+
+当你发现有如下两行：
+nginx   46994   root    6u  IPv4 1654262      0t0  TCP *:1935 (LISTEN)
+nginx   46995 nobody    6u  IPv4 1654262      0t0  TCP *:1935 (LISTEN)
+则说明nginx这边已经成功的执行了监听。
+
+===========================================================
+直播
+
+在ps4上，开一个游戏，按手柄上的share，并选择“播放游玩过程”，选择twitch，并且一路下一步，直到右上角出on air，说明直播开始。
+再去之前的电脑上执行
+sudo lsof -i:1935 
+当你发现又多了几行的时候，说明成功了。
+现在去自己的直播间看，应该能看直播情况了。
+
