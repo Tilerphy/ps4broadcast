@@ -1,3 +1,41 @@
+=======================使用========================
+一台Debian 8以上或者Ubuntu 14以上的Linux计算机，与PS4在同一局域网
+下载install.sh 和 start.sh
+执行：
+sudo chmod 777 install.sh
+sudo chmod 777 start.sh
+sudo ./install.sh
+sudo ./start.sh <address> <key>
+比如斗鱼，给出的有两行，第一行是rtmp://send1a.douyu.com/live, 第二行是你的直播key： ahgjwroejgrsnfbewqewqftsdgsdgsfdsfoff
+那么请执行：
+sudo ./start.sh "rtmp://send1a.douyu.com/live" "ahgjwroejgrsnfbewqew=qftsdgsdgsfdsf=off"
+一定要注意每个参数都用双引号括起来，因为两个参数都有shell中的特殊字符。
+
+然后执行
+sudo lsof -i:1935
+如果你的linux系统没有lsof命令，请安装 sudo apt-get install lsof
+
+当你发现有如下两行：
+nginx   46994   root    6u  IPv4 1654262      0t0  TCP *:1935 (LISTEN)
+nginx   46995 nobody    6u  IPv4 1654262      0t0  TCP *:1935 (LISTEN)
+则说明nginx这边已经成功的执行了监听。
+
+=====================开始直播==============================
+
+直播
+
+在ps4上，开一个游戏，按手柄上的share，并选择“播放游玩过程”，选择twitch，并且一路下一步，直到右上角出on air，说明直播开始。
+再去之前的电脑上执行
+sudo lsof -i:1935 
+当你发现又多了几行的时候，说明成功了。
+现在去自己的直播间看，应该能看直播情况了。
+
+
+
+
+
+
+===========================解释=====================
 这套脚本的作用如下：
 
 install.sh
@@ -32,33 +70,6 @@ rtmp { include /usr/local/nginx/conf/rtmp.conf.d/*;}
 网关是192.168.200.1，DNS随意选择，可以是114.114.114.114，也可以是你计算机最快的DNS。请不要用8.8.8.8，这个DNS早就无法使用了。
 
 
-=========================================================
 
-start.sh
 
-这个脚本需要参数，格式如下
-
-sudo ./start.sh <address> <key>
-比如斗鱼，给出的有两行，第一行是rtmp://send1a.douyu.com/live, 第二行是你的直播key： ahgjwroejgrsnfbewqewqftsdgsdgsfdsfoff
-那么请执行：
-sudo ./start.sh "rtmp://send1a.douyu.com/live" "ahgjwroejgrsnfbewqew=qftsdgsdgsfdsf=off"
-一定要注意每个参数都用双引号括起来，因为两个参数都有shell中的特殊字符。
-
-然后执行
-sudo lsof -i:1935
-如果你的linux系统没有lsof命令，请安装 sudo apt-get install lsof
-
-当你发现有如下两行：
-nginx   46994   root    6u  IPv4 1654262      0t0  TCP *:1935 (LISTEN)
-nginx   46995 nobody    6u  IPv4 1654262      0t0  TCP *:1935 (LISTEN)
-则说明nginx这边已经成功的执行了监听。
-
-===========================================================
-直播
-
-在ps4上，开一个游戏，按手柄上的share，并选择“播放游玩过程”，选择twitch，并且一路下一步，直到右上角出on air，说明直播开始。
-再去之前的电脑上执行
-sudo lsof -i:1935 
-当你发现又多了几行的时候，说明成功了。
-现在去自己的直播间看，应该能看直播情况了。
 
