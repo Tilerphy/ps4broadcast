@@ -8,7 +8,7 @@ iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --
 =======================前言=======================
 强烈建议使用独立系统，不要在任何的生产环境下使用这两个脚本，会出大问题的。
 =======================使用========================
-一台Debian 8以上或者Ubuntu 14以上的Linux计算机，与PS4在同一局域网
+一台Debian 8以上机器与PS4在同一局域网，理论上Ubuntu也行，但是现在有些问题正在解决。推荐debian
 1. 执行：
 sudo chmod 777 install.sh
 sudo chmod 777 start.sh
