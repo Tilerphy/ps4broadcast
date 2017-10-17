@@ -1,5 +1,5 @@
 echo "install the required software......"
-apt-get install libpcre3-dev
+apt-get install libpcre3-dev nodejs
 echo "download nginx......"
 wget http://nginx.org/download/nginx-1.12.1.tar.gz
 tar -xvf nginx-1.12.1.tar.gz
