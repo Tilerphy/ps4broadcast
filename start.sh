@@ -11,3 +11,4 @@ echo "push "$1"/"$2";" >> ./prepared.conf
 echo "}}" >> ./prepared.conf
 mv ./prepared.conf /usr/local/nginx/conf/rtmp.conf.d/douyu
 /usr/local/nginx/sbin/nginx
+node ./danmu.js
