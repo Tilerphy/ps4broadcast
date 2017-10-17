@@ -3,18 +3,22 @@
 增加一条路由转发，将所有网内发往6667的数据转发至本机虚拟网关的6667端口
 iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
 开发danmu.js监听本机虚拟网关的6667端口，并且实现Twitch IRC协议的握手。
-
 随后转发斗鱼的评论。
+
 =======================前言=======================
 强烈建议使用独立系统，不要在任何的生产环境下使用这两个脚本，会出大问题的。
 =======================使用========================
 一台Debian 8以上或者Ubuntu 14以上的Linux计算机，与PS4在同一局域网
-下载install.sh 和 start.sh
-执行：
+1. 执行：
 sudo chmod 777 install.sh
 sudo chmod 777 start.sh
 sudo ./install.sh
-sudo ./start.sh <address> <key>
+执行npm install douyu安装douyu的nodejs组件
+请记住网关的ip,默认是 192.168.200.1
+
+2.修改danmu.js中的roomid为你的斗鱼直播间id。修改danmu.js中的host为你的网关地址，默认为192.168.200.1
+3. sudo ./start.sh <address> <key> &
+注意最后的& 也要有。
 比如斗鱼，给出的有两行，第一行是rtmp://send1a.douyu.com/live, 第二行是你的直播key： ahgjwroejgrsnfbewqewqftsdgsdgsfdsfoff
 那么请执行：
 sudo ./start.sh "rtmp://send1a.douyu.com/live" "ahgjwroejgrsnfbewqew=qftsdgsdgsfdsf=off"
