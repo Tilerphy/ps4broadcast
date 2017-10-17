@@ -1,7 +1,9 @@
 var net = require("net");
 var douyu = require("douyu");
+//roomid 应该是你的斗鱼直播房间号
 var roomid= "1035304";
 var room = new douyu.ChatRoom(roomid);
+// 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
 var host = "192.168.200.1";
 var port = 6667;
 var Client = function(sock){
@@ -24,6 +26,22 @@ room.on("uenter", (msg)=>{
                 client.toPS4(msg.nn, "进入直播间");
         }else{
                 console.log(msg.nn+": 进入直播间");
+        }
+});
+
+room.on("dgb", (msg)=>{
+        if(client){
+                client.toPS4(msg.nn, "送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
+        }else{
+                console.log(msg.nn+"送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
+        }
+});
+
+room.on("spbc", (msg)=>{
+        if(client){
+                client.toPS4(msg.sn, "送出"+msg.gc+"个"+msg.gn);
+        }else{
+                console.log(msg.sn+ "送出"+msg.gc+"个"+msg.gn);
         }
 });
 net.createServer((sock)=>{
