@@ -16,16 +16,16 @@ var Client = function(sock){
 var  client = null;
 room.on("chatmsg", (msg)=>{
         if(client){
-                client.toPS4(msg.nn,msg.txt);
+                client.toPS4(msg.nn + " Lv."+ msg.level, msg.txt);
         }else{
-                console.log(msg.nn+":"+msg.txt);
+                console.log(msg.nn + " Lv."+ msg.level+":"+msg.txt);
         }
 });
 room.on("uenter", (msg)=>{
         if(client){
-                client.toPS4(msg.nn, "进入直播间");
+                client.toPS4(msg.nn + " Lv."+ msg.level, "进入直播间");
         }else{
-                console.log(msg.nn+": 进入直播间");
+                console.log(msg.nn + " Lv."+ msg.level+": 进入直播间");
         }
 });
 
