@@ -9,8 +9,8 @@ echo "clone nginx-rtmp-module from Github.........."
 git clone https://github.com/Tilerphy/nginx-rtmp-module.git
 echo "Complile nginx with rtmp-module....................."
 ./configure --prefix=../nginx-aio --add-module=./nginx-rtmp-module
-make
 echo "Install nginx to /usr/local/nginx..................."
+make
 make install
 echo "Prepare the rtmp config folder."
 rm -rf ../nginx-aio/conf/rtmp.conf.d

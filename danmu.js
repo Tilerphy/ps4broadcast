@@ -29,7 +29,7 @@ room.on("uenter", (msg)=>{
 });
 
 //斗鱼提供内置的答谢回复，且斗鱼给出的弹幕开发文档中gfcnt 和 hits并没有出现
-//废弃这个事件
+//废弃
 //room.on("dgb", (msg)=>{
 //        if(client){
 //                client.toPS4(msg.nn, "送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
