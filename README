@@ -2,6 +2,19 @@
 经网友测试，Ubuntu 16.04 16.10 17.04 17.10都无法使用，原因未知，希望大神帮助解决。
 可能是iptables masquerade功能失效 或者 设置的软网卡失效 引起。
 
+===============更新： 增加Raspbian支持==========================
+在树莓派中也能用啦！Raspbian是debian在ARM上的编译发行版，当然很好用。
+第三代树莓派使用的nodejs需要下载ARM v7版本。
+如果想要看自己的树莓派是什么CPU版本，执行 cat /proc/cpuinfo就好了。
+如果找不到对应的nodejs bin版本，将install.sh脚本中的
+#wget https://nodejs.org/dist/v8.7.0/node-v8.7.0.tar.gz
+#tar -xvf node-v8.7.0.tar.gz
+#cd node-v8.7.0
+#./configure
+#make
+#make install
+注释解开，就可以编译一份属于自己CPU版本的nodejs了。
+
 ================更新：增加nodejs监控界面===================
 增加一个文件start.js
 通过nodejs对整套环境进行监控和控制。
