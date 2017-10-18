@@ -8,17 +8,17 @@ cd nginx-1.12.1
 echo "clone nginx-rtmp-module from Github.........."
 git clone https://github.com/Tilerphy/nginx-rtmp-module.git
 echo "Complile nginx with rtmp-module....................."
-./configure --prefix=../nginx-aio --add-module=./nginx-rtmp-module
+./configure --prefix=/usr/local/nginx/ --add-module=./nginx-rtmp-module
 echo "Install nginx to /usr/local/nginx..................."
 make
 make install
 echo "Prepare the rtmp config folder."
-rm -rf ../nginx-aio/conf/rtmp.conf.d
-mkdir ../nginx-aio/conf/rtmp.conf.d
-chmod 777 ../nginx-aio/conf/rtmp.conf.d
-chmod 777 ../nginx-aio/sbin/nginx
-sed -i "s/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/\*;}//g" ../nginx-aio/conf/nginx.conf
-sed -i "s/#user  nobody;/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/*;}\n#user  nobody;/g"  ../nginx-aio/conf/nginx.conf
+rm -rf /usr/local/nginx/conf/rtmp.conf.d
+mkdir /usr/local/nginx/conf/rtmp.conf.d
+chmod 777 /usr/local/nginx/conf/rtmp.conf.d
+chmod 777 /usr/local/nginx/sbin/nginx
+sed -i "s/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/\*;}//g" /usr/local/nginx/conf/nginx.conf
+sed -i "s/#user  nobody;/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/*;}\n#user  nobody;/g"  /usr/local/nginx/conf/nginx.conf
 echo "Configure iptables................."
 #remove old
 #sed -i "s/iptables -N ps4broadcast -t nat//g" /etc/rc.local
