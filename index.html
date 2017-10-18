@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>PS4Broadcast Control Panel v0.1</title>
+  </head>
+<body onload="loaded()">
+
+<p>URL:</p>
+<input type="textbox" id="url" style="width:30%">
+<p>CODE:</p>
+<input type="textbox" id="code" style="width:30%"><input type="button" value="Reset Living" onclick="resetLiving()">
+<p>Messages:</p>
+<textarea id="messages" style="width:100%;height:400px">
+</textarea>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var socket = io();
+	function loaded(){
+		
+		socket.on("message", function(m){
+			var  messages = document.getElementById("messages");
+			messages.value = messages.value += m +"\n";
+		});
+
+		socket.on("living", function(status){
+			var  messages = document.getElementById("messages");
+                        messages.value = messages.value += "LIVING STATUS: "+ status +"\n";
+		});
+	}
+
+	function resetLiving(){
+		socket.emit("resetlive",{url:document.getElementById("url").value, code:document.getElementById("code").value});
+	}
+</script>
+</body>
+</html>
