@@ -5,7 +5,7 @@ wget http://nginx.org/download/nginx-1.12.1.tar.gz
 tar -xvf nginx-1.12.1.tar.gz
 cd nginx-1.12.1
 echo "clone nginx-rtmp-module from Github.........."
-git clone git@github.com:arut/nginx-rtmp-module.git
+git clone https://github.com/Tilerphy/nginx-rtmp-module.git
 echo "Complile nginx with rtmp-module....................."
 ./configure --add-module=./nginx-rtmp-module
 make
