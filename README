@@ -7,6 +7,13 @@
 通过nodejs对整套环境进行监控和控制。
 因为用到了Promise和一些其他的es6内容，所以需要nodejs 较新版本，建议去https://nodejs.org/en/download/current/ 
 下载nodejs的bin版本，这句没有写到install.sh的原因是……编译太慢了。
+这句下载编译安装nodejs的语句还在install.sh里面，只是注释了，将下面这些解开注释（去掉#）就好了：
+#wget https://nodejs.org/dist/v8.7.0/node-v8.7.0.tar.gz
+#tar -xvf node-v8.7.0.tar.gz
+#cd node-v8.7.0
+#./configure
+#make
+#make install
 执行sudo node ./start.js， 然后访问你的虚拟机或者操作系统的26666端口即可，比如我的是 http://192.168.0.20:26666/
 在上面输入直播rtmp地址 和 直播码，点击reset live，界面出现LIVING STATUS: true就可以了。
 
