@@ -5,7 +5,8 @@
 ================更新：增加nodejs监控界面===================
 增加一个文件start.js
 通过nodejs对整套环境进行监控和控制。
-因为用到了Promise和一些其他的es6内容，所以需要nodejs 较新版本，建议去https://nodejs.org/en/下载nodejs版本（这句将会被写入install.sh中）
+因为用到了Promise和一些其他的es6内容，所以需要nodejs 较新版本，建议去https://nodejs.org/en/download/current/ 
+下载nodejs的bin版本，这句没有写到install.sh的原因是……编译太慢了。
 执行sudo node ./start.js， 然后访问你的虚拟机或者操作系统的26666端口即可，比如我的是 http://192.168.0.20:26666/
 在上面输入直播rtmp地址 和 直播码，点击reset live，界面出现LIVING STATUS: true就可以了。
 
