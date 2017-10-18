@@ -12,6 +12,13 @@ echo "Complile nginx with rtmp-module....................."
 echo "Install nginx to /usr/local/nginx..................."
 make
 make install
+#echo "Install nodejs.."
+#wget https://nodejs.org/dist/v8.7.0/node-v8.7.0.tar.gz
+#tar -xvf node-v8.7.0.tar.gz
+#cd node-v8.7.0
+#./configure
+#make
+#make install
 echo "Prepare the rtmp config folder."
 rm -rf /usr/local/nginx/conf/rtmp.conf.d
 mkdir /usr/local/nginx/conf/rtmp.conf.d
