@@ -16,33 +16,34 @@ var Client = function(sock){
 var  client = null;
 room.on("chatmsg", (msg)=>{
         if(client){
-                client.toPS4(msg.nn + " Lv."+ msg.level, msg.txt);
-        }else{
-                console.log(msg.nn + " Lv."+ msg.level+":"+msg.txt);
+                client.toPS4(msg.nn, msg.txt);
         }
+        console.log(msg.nn + ":"+msg.txt);
 });
 room.on("uenter", (msg)=>{
         if(client){
-                client.toPS4(msg.nn + " Lv."+ msg.level, "进入直播间");
-        }else{
-                console.log(msg.nn + " Lv."+ msg.level+": 进入直播间");
+                client.toPS4(msg.nn, "进入直播间");
         }
+       	console.log(msg.nn +": 进入直播间");
+        
 });
 
-room.on("dgb", (msg)=>{
-        if(client){
-                client.toPS4(msg.nn, "送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
-        }else{
-                console.log(msg.nn+"送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
-        }
-});
+//斗鱼提供内置的答谢回复，且斗鱼给出的弹幕开发文档中gfcnt 和 hits并没有出现
+//废弃这个事件
+//room.on("dgb", (msg)=>{
+//        if(client){
+//                client.toPS4(msg.nn, "送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
+//        }else{
+//                console.log(msg.nn+"送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
+//        }
+//});
 
 room.on("spbc", (msg)=>{
         if(client){
                 client.toPS4(msg.sn, "送出"+msg.gc+"个"+msg.gn);
-        }else{
-                console.log(msg.sn+ "送出"+msg.gc+"个"+msg.gn);
         }
+        console.log(msg.sn+ "送出"+msg.gc+"个"+msg.gn);
+        
 });
 net.createServer((sock)=>{
 
