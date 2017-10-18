@@ -28,23 +28,13 @@ room.on("uenter", (msg)=>{
         
 });
 
-//斗鱼提供内置的答谢回复，且斗鱼给出的弹幕开发文档中gfcnt 和 hits并没有出现
-//废弃
-//room.on("dgb", (msg)=>{
-//        if(client){
-//                client.toPS4(msg.nn, "送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
-//        }else{
-//                console.log(msg.nn+"送出"+msg.gfcnt+"个礼物 "+msg.hits+" hits!");
-//        }
-//});
-
-room.on("spbc", (msg)=>{
+room.on("dgb", (msg)=>{
         if(client){
-                client.toPS4(msg.sn, "送出"+msg.gc+"个"+msg.gn);
+                client.toPS4(msg.sn+"送出礼物√", gift[msg.gfid]);
         }
-        console.log(msg.sn+ "送出"+msg.gc+"个"+msg.gn);
-        
+        console.log(msg.sn+"送出礼物√ : "+gift[msg.gfid]);
 });
+
 net.createServer((sock)=>{
 
         console.log("connected");
