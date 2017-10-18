@@ -2,6 +2,7 @@ var fs =require("fs");
 var express= require("express");
 var app = express();
 var http = require("http").Server(app);
+var xhttp = require("http");
 var io= require("socket.io")(http);
 var exec = require("child_process").exec;
 //start danmu Redirect
@@ -23,6 +24,38 @@ var Client = function(sock){
                 this.sock.write(":"+name+"!"+name+"@"+name+".tmi.twitch.tv PRIVMSG #"+name+" :"+message+"\r\n");
                 this.sock.write("\r\n");
         };
+
+	this.flushUserNumber = function(debugCallback){
+		var all="";
+		var req = xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/"+roomid, (res)=>{
+				res.on("data", (data)=>{
+					all+=data.toString();
+				});
+				res.on("end",()=>{
+					var roomstate = JSON.parse(all);
+					var online = 0;
+					var fakeUsers = [];
+					var fakeUsersList = "";
+					if(roomstate && roomstate.data){
+						online = parseInt(roomstate.data.online);
+					}
+
+					for(var i = 3 ;i < online; i ++){
+						fakeUsers[fakeUsers.length]=i;
+					}
+					if(fakeUsers.length > 0){
+						fakeUsersList = fakeUsers.join(" ");
+						this.sock.write(":"+twitchId+".tmi.twitch.tv 353 "+twitchId+" = #"+twitchId+" :"+twitchId+" 1 2\r\n");
+						this.sock.write(":"+twitchId+".tmi.twitch.tv 353 "+twitchId+" = #"+twitchId+" :"+fakeUsersList+"\r\n");
+                				this.sock.write(":"+twitchId+".tmi.twitch.tv 366 "+twitchId+" #"+twitchId+" :End of /NAMES list\r\n");
+                				this.sock.write("\r\n");
+					}
+					if(debugCallback){
+						debugCallback(online);
+					}
+				});
+			});
+	}
 }
 
 io.on("connection", (websock)=>{
@@ -49,6 +82,7 @@ room.on("chatmsg", (msg)=>{
 room.on("uenter", (msg)=>{
         if(client){
                 client.toPS4(msg.nn, "进入直播间");
+		client.flushUserNumber();
         }
        	io.emit("message",msg.nn +": 进入直播间");
         
