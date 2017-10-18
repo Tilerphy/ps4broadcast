@@ -82,7 +82,8 @@ room.on("chatmsg", (msg)=>{
 room.on("uenter", (msg)=>{
         if(client){
                 client.toPS4(msg.nn, "进入直播间");
-		client.flushUserNumber();
+		//bug here
+		//client.flushUserNumber();
         }
        	io.emit("message",msg.nn +": 进入直播间");
         
