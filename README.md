@@ -23,7 +23,7 @@ Debian 8 或者 Raspbian（树莓派操作系统，debian的ARM编译）的电�
 Nodejs 6+ 建议直接到Nodejs v8.7.0
 
 # 着手准备
-1. 执行`apt-get install -y git sudo libnet-ifconfig-wrapper-perl`安装git工具与sudo命令和ifconfig工具，sudo的用处是以管理员身份来执行命令。
+1. 执行`apt-get install -y git sudo  tar libnet-ifconfig-wrapper-perl xz-utils`安装git工具与sudo命令和ifconfig工具，sudo的用处是以管理员身份来执行命令。
 2. 为了方便起见在`/`目录下创建一个目录 `mkdir /ps4broadcast`
 3. 进入这个目录`cd /ps4broadcast`
 4. `git clone https://github.com/Tilerphy/ps4broadcast.git`
