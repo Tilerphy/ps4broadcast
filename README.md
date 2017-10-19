@@ -17,13 +17,29 @@
 # 准备工作
 
 Debian 8 或者 Raspbian（树莓派操作系统，debian的ARM编译）的电脑或者树莓派或者虚拟机，这台电脑的ip假设是`192.168.0.8`
-
-一台其他的电脑或者虚拟机的运行机器，这台电脑的ip假设是`192.168.0.100`
+一台其他的电脑或者虚拟机的运行机器
 
 Nodejs 6+ 建议直接到Nodejs v8.7.0
 
+# 局域网真实IP，网卡设备号
+
+执行ifconfig获取到当前的网卡地址，一般是eth0也有一些是eth1,或者enp0s3什么的, 类似
+```
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.8 netmask 255.255.0.0  broadcast 192.168.255.255
+        inet6 fe80::2e0:66ff:fee7:e31b  prefixlen 64  scopeid 0x20<link>
+        ether 00:e0:86:f7:e3:1b  txqueuelen 1000  (Ethernet)
+        RX packets 20558634  bytes 16007006847 (14.9 GiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 17867778  bytes 15731185654 (14.6 GiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+```
+`eth0`就是网卡的设备号
+`192.168.0.8` 就是这台机器的真实IP
+
 # 着手准备
-1. 执行`apt-get install -y git sudo  tar libnet-ifconfig-wrapper-perl xz-utils`安装git工具与sudo命令和ifconfig工具，sudo的用处是以管理员身份来执行命令。
+1. 执行`apt-get install -y git sudo tar libnet-ifconfig-wrapper-perl xz-utils`安装工具，sudo的用处是以管理员身份来执行命令。
 2. 为了方便起见在`/`目录下创建一个目录 `mkdir /ps4broadcast`
 3. 进入这个目录`cd /ps4broadcast`
 4. `git clone https://github.com/Tilerphy/ps4broadcast.git`
@@ -36,12 +52,7 @@ cd node-v8.7.0
 sudo ./configure
 sudo make && sudo make install
 ```
-等待一段时间提示成功后，执行以下操作
-```
-ln -s /bin/node /usr/local/bin/node
-ln -s /bin/npm /usr/local/bin/npm
 
-```
 执行 `node -v` 得到的结果应该是`v8.7.0`或者其他版本号。
 
 # 准备完成，检查
@@ -58,79 +69,18 @@ ln -s /bin/npm /usr/local/bin/npm
 cd /ps4broadcast/ps4broadcast
 sudo chmod 777 install.sh
 sudo chmod 777 start.sh
+sudo chmod 777 start-web.sh
 
 ```
-执行ifconfig获取到当前的网卡地址，一般是eth0也有一些是eth1,或者enp0s3什么的, 类似
-```
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 192.168.88.139  netmask 255.255.0.0  broadcast 192.168.255.255
-        inet6 fe80::2e0:66ff:fee7:e31b  prefixlen 64  scopeid 0x20<link>
-        ether 00:e0:86:f7:e3:1b  txqueuelen 1000  (Ethernet)
-        RX packets 20558634  bytes 16007006847 (14.9 GiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 17867778  bytes 15731185654 (14.6 GiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-
-```
-eth0就是网卡的设备号
 
 执行安装脚本
 ```
-sudo ./install.sh eth0
+sudo ./install.sh
 
 ```
-执行结束后进行检查rc.local
-```
-sudo cat /etc/rc.local
-
-```
-应该存在了这些：
-```
-ifconfig eth0:2 192.168.200.1 netmask 255.255.255.0
-sysctl -w net.ipv4.ip_forward=1
-sysctl -p
-iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN
-iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935
-#iptables -t nat -A PREROUTING -s 192.168.200.0/24 -j ps4broadcast
-iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
-iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
-
-```
-然后检查虚拟网卡状态：
-```
-sudo ifconfig
-
-```
-应该能够找到一个`eth0:2`的设备，而且ip是`192.168.200.1`
-
-最后检查iptables状态
-
-```
-sudo iptables -L -t nat
-```
-应该能看到类似这样的结果：
-```
-Chain PREROUTING (policy ACCEPT)
-target     prot opt source               destination
-RETURN     all  --  192.168.200.1        anywhere
-DNAT       tcp  --  192.168.200.0/24     anywhere             tcp dpt:1935 to:192.168.200.1:1935
-DNAT       tcp  --  192.168.200.0/24     anywhere             tcp dpt:ircd to:192.168.200.1:6667
-
-Chain INPUT (policy ACCEPT)
-target     prot opt source               destination
-
-Chain OUTPUT (policy ACCEPT)
-target     prot opt source               destination
-
-Chain POSTROUTING (policy ACCEPT)
-target     prot opt source               destination
-MASQUERADE  all  --  anywhere             anywhere
-```
-至此安装阶段顺利结束。
-
----
 
 # 开始直播？
+
 0. Twitch
 
 在什么都没做的情况下，在PS4上开一个游戏，按手柄的share键，选择“播放游玩画面”，选择twitch，如果之前没有进行过twitch直播，此时会要求你注册一个twitch账号。请根据提示一步步注册一个账号，并且`记住你的twitchid`
@@ -146,32 +96,20 @@ MASQUERADE  all  --  anywhere             anywhere
 
 2. 我们的服务器
 
+这里需要用到设备号，假设之前获取到的设备号是`eth0`
+
 ```
 cd /ps4broadcast/ps4broadcast
 
-```
-然后用你熟悉的方式打开start.js, 将其中的
-```
-var roomid = "1035304";
-```
-的`1035304`改成你的斗鱼`房间ID`。
+sudo ./start-web eth0
 
-```
-var twitchId = "tilerphy";
-```
-的`tilerphy`改成你的`twitchid`。
-
-关闭start.js文件。
-
-执行
-
-```
-sudo node start.js
 ```
 
 3. Control Panel
 
 打开http://192.168.0.8:26666/
+
+填入`Twitch ID`（Twitch的登录名），与 `Douyu Room Id`（斗鱼直播间号）
 
 将斗鱼那边得到的 `url` 和 `code` 填入后，点击`reset live`
 
