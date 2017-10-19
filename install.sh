@@ -26,37 +26,37 @@ chmod 777 /usr/local/nginx/conf/rtmp.conf.d
 chmod 777 /usr/local/nginx/sbin/nginx
 sed -i "s/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/\*;}//g" /usr/local/nginx/conf/nginx.conf
 sed -i "s/#user  nobody;/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/*;}\n#user  nobody;/g"  /usr/local/nginx/conf/nginx.conf
-echo "Configure iptables................."
+#echo "Configure iptables................."
 #remove old
 #sed -i "s/iptables -N ps4broadcast -t nat//g" /etc/rc.local
-sed -i "s/ifconfig $1:2 192.168.200.1 netmask 255.255.255.0//g" /etc/rc.local
-sed -i "s/sysctl -w net.ipv4.ip_forward=1//g" /etc/rc.local
-sed -i "s/sysctl -p//g" /etc/rc.local
-sed -i "s/iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN//g" /etc/rc.local
-sed -i "s/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935//g" /etc/rc.local
+#sed -i "s/ifconfig $1:2 192.168.200.1 netmask 255.255.255.0//g" /etc/rc.local
+#sed -i "s/sysctl -w net.ipv4.ip_forward=1//g" /etc/rc.local
+#sed -i "s/sysctl -p//g" /etc/rc.local
+#sed -i "s/iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN//g" /etc/rc.local
+#sed -i "s/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935//g" /etc/rc.local
 #sed -i "s/iptables -t nat -A PREROUTING -s 192.168.200.0\/24 -j ps4broadcast//g" /etc/rc.local
-sed -i "s/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667//g" /etc/rc.local
-sed -i "s/iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE//g" /etc/rc.local
+#sed -i "s/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667//g" /etc/rc.local
+#sed -i "s/iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE//g" /etc/rc.local
 #add back
 #sed -i "s/exit 0/iptables -N ps4broadcast -t nat\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/ifconfig $1:2 192.168.200.1 netmask 255.255.255.0\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/sysctl -w net.ipv4.ip_forward=1\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/sysctl -p\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/ifconfig $1:2 192.168.200.1 netmask 255.255.255.0\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/sysctl -w net.ipv4.ip_forward=1\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/sysctl -p\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935\nexit 0/g" /etc/rc.local
 #sed -i "s/exit 0/iptables -t nat -A PREROUTING -s 192.168.200.0\/24 -j ps4broadcast\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667\nexit 0/g" /etc/rc.local
-sed -i "s/exit 0/iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0\/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667\nexit 0/g" /etc/rc.local
+#sed -i "s/exit 0/iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE\nexit 0/g" /etc/rc.local
 #real do
 #iptables -N ps4broadcast -t nat
-ifconfig $1:2 192.168.200.1 netmask 255.255.255.0
-sysctl -w net.ipv4.ip_forward=1
-sysctl -p
-iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN
-iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935
+#ifconfig $1:2 192.168.200.1 netmask 255.255.255.0
+#sysctl -w net.ipv4.ip_forward=1
+#sysctl -p
+#iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN
+#iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935
 #iptables -t nat -A PREROUTING -s 192.168.200.0/24 -j ps4broadcast
-iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
-iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
+#iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
+#iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
 clear
 echo "Complete."
 echo "Set on PS4/XBOX ONE/OBS"
