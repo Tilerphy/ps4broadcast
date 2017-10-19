@@ -1,14 +1,9 @@
-killall nginx
-echo "server {" > ./prepared.conf
-echo "listen 1935;" >> ./prepared.conf
-echo "chunk_size 131072;" >> ./prepared.conf
-echo "max_message 256M;" >> ./prepared.conf
-echo "application app {" >> ./prepared.conf
-echo "live on;" >> ./prepared.conf
-echo "record off;" >> ./prepared.conf
-echo "meta copy;" >> ./prepared.conf
-echo "push "$1"/"$2";" >> ./prepared.conf
-echo "}}" >> ./prepared.conf
-mv ./prepared.conf /usr/local/nginx/conf/rtmp.conf.d/douyu
-/usr/local/nginx/sbin/nginx
-node ./danmu.js
+ifconfig $1:2 192.168.200.1 netmask 255.255.255.0
+sysctl -w net.ipv4.ip_forward=1
+sysctl -p
+iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.1 -j RETURN
+iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --to-destination 192.168.200.1:1935
+#iptables -t nat -A PREROUTING -s 192.168.200.0/24 -j ps4broadcast
+iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
+iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
+node ./start.js
