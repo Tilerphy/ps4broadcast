@@ -115,6 +115,8 @@ sudo ./start-web eth0
 
 如果得到`LIVING STATUS: true`说明一切运行正常。
 
+![](https://github.com/Tilerphy/ps4broadcast/blob/master/help.png)
+
 4. PS4
 
 设置->网络->LAN或者无线->自定
