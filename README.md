@@ -60,9 +60,23 @@ sudo chmod 777 install.sh
 sudo chmod 777 start.sh
 
 ```
+执行ifconfig获取到当前的网卡地址，一般是eth0也有一些是eth1,或者enp0s3什么的, 类似
+```
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.88.139  netmask 255.255.0.0  broadcast 192.168.255.255
+        inet6 fe80::2e0:66ff:fee7:e31b  prefixlen 64  scopeid 0x20<link>
+        ether 00:e0:86:f7:e3:1b  txqueuelen 1000  (Ethernet)
+        RX packets 20558634  bytes 16007006847 (14.9 GiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 17867778  bytes 15731185654 (14.6 GiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+```
+eth0就是网卡的设备号
+
 执行安装脚本
 ```
-sudo ./install.sh
+sudo ./install.sh eth0
 
 ```
 执行结束后进行检查rc.local
