@@ -57,11 +57,12 @@ sed -i "s/#user  nobody;/rtmp { include \/usr\/local\/nginx\/conf\/rtmp.conf.d\/
 #iptables -t nat -A PREROUTING -s 192.168.200.0/24 -j ps4broadcast
 #iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
 #iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
-clear
-echo "Complete."
+#clear
+echo "###############################################"
+echo "Completed."
 echo "Set on PS4/XBOX ONE/OBS"
 echo "IP: 192.168.200.any"
 echo "Gateway: 192.168.200.1"
 echo "Netmask: 255.255.255.0"
 echo "DNS: YOUR BEST DNS, mayebe 114.114.114.114"
-echo "Please run './start.sh <rtmp address> <rtmp key>' by yourself."
+echo "run ./start-web.sh <network device> to start web-server."

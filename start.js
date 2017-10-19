@@ -5,65 +5,39 @@ var http = require("http").Server(app);
 var xhttp = require("http");
 var io= require("socket.io")(http);
 var exec = require("child_process").exec;
-//start danmu Redirect
-//
-//
 var net = require("net");
 var douyu = require("douyu");
-//roomid 应该是你的斗鱼直播房间号
-var roomid= "1035304";
-var room = new douyu.ChatRoom(roomid);
 var gift = require("./gift");
 // 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
 var host = "192.168.200.1";
 var port = 6667;
-var twitchId = "tilerphy";
-var Client = function(sock){
+var Client = function(tid, sock){
         this.sock = sock;
-        this.toPS4 = function(name, message){
+	this.tid = tid;
+        this.toPS4 = (name, message)=>{
                 this.sock.write(":"+name+"!"+name+"@"+name+".tmi.twitch.tv PRIVMSG #"+name+" :"+message+"\r\n");
                 this.sock.write("\r\n");
         };
-
-	this.flushUserNumber = function(debugCallback){
-		var all="";
-		var req = xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/"+roomid, (res)=>{
-				res.on("data", (data)=>{
-					all+=data.toString();
-				});
-				res.on("end",()=>{
-					var roomstate = JSON.parse(all);
-					var online = 0;
-					var fakeUsers = [];
-					var fakeUsersList = "";
-					if(roomstate && roomstate.data){
-						online = parseInt(roomstate.data.online);
-					}
-
-					for(var i = 3 ;i < online; i ++){
-						fakeUsers[fakeUsers.length]=i;
-					}
-					if(fakeUsers.length > 0){
-						fakeUsersList = fakeUsers.join(" ");
-						this.sock.write(":"+twitchId+".tmi.twitch.tv 353 "+twitchId+" = #"+twitchId+" :"+twitchId+" 1 2\r\n");
-						this.sock.write(":"+twitchId+".tmi.twitch.tv 353 "+twitchId+" = #"+twitchId+" :"+fakeUsersList+"\r\n");
-                				this.sock.write(":"+twitchId+".tmi.twitch.tv 366 "+twitchId+" #"+twitchId+" :End of /NAMES list\r\n");
-                				this.sock.write("\r\n");
-					}
-					if(debugCallback){
-						debugCallback(online);
-					}
-				});
-			});
-	}
+	this.sendHandshake =  ()=>{
+		this.sock.write(":tmi.twitch.tv 001 "+this.tid+" :Welcome, GLHF!\r\n");
+                this.sock.write(":tmi.twitch.tv 002 "+this.tid+" :Your host is tmi.twitch.tv\r\n");
+                this.sock.write(":tmi.twitch.tv 003 "+this.tid+" :This server is rather new\r\n");
+                this.sock.write(":tmi.twitch.tv 004 "+this.tid+" :-\r\n");
+                this.sock.write(":tmi.twitch.tv 375 "+this.tid+" :-\r\n");
+                this.sock.write(":tmi.twitch.tv 372 "+this.tid+" :You are in a maze of twisty passages, all alike.\r\n");
+                this.sock.write(":tmi.twitch.tv 376 "+this.tid+" :>\r\n");
+                this.sock.write("\r\n");
+	};
 }
 
 io.on("connection", (websock)=>{
         websock.emit("message", "Connected to PS4broadcast-WebRunner");
         websock.on("resetlive", (msg)=>{
-                        var lp = new LivingProcess(msg.url, msg.code);
+                        var lp = new LivingProcess(msg.tid, msg.rid, msg.url, msg.code);
                         lp.prepare
                           .then(lp.config)
+			  .then(lp.configDanmu)
+			  .then(lp.configTwitchClient)
                           .then(lp.start)
                           .then(()=>{
                                 io.emit("living", true);
@@ -72,75 +46,77 @@ io.on("connection", (websock)=>{
                         });
         });
 });
-var  client = null;
-room.on("chatmsg", (msg)=>{
-        if(client){
-                client.toPS4(msg.nn, msg.txt);
-        }
-        io.emit("message",msg.nn + ":"+msg.txt);
-});
-room.on("uenter", (msg)=>{
-        if(client){
-                client.toPS4(msg.nn, "进入直播间");
-		//bug here
-		//client.flushUserNumber();
-        }
-       	io.emit("message",msg.nn +": 进入直播间");
-        
-});
-
-
-
-room.on("dgb", (msg)=>{
-	if(client){
-		client.toPS4(msg.sn+"送出礼物√", gift[msg.gfid]);
-	}
-	io.emit("message", msg.sn+"送出礼物√ : "+gift[msg.gfid]);
-});
-
-net.createServer((sock)=>{
-
-        console.log("connected");
-        client = new Client(sock);
-        sock.on("data", (d)=>{
-                var message = d.toString();
-                console.log(message);
-                if(message.indexOf("NICK") == 0){
-                        sock.write(":tmi.twitch.tv 001 "+twitchId+" :Welcome, GLHF!\r\n");
-                        sock.write(":tmi.twitch.tv 002 "+twitchId+" :Your host is tmi.twitch.tv\r\n");
-                        sock.write(":tmi.twitch.tv 003 "+twitchId+" :This server is rather new\r\n");
-                        sock.write(":tmi.twitch.tv 004 "+twitchId+" :-\r\n");
-                        sock.write(":tmi.twitch.tv 375 "+twitchId+" :-\r\n");
-                        sock.write(":tmi.twitch.tv 372 "+twitchId+" :You are in a maze of twisty passages, all alike.\r\n");
-                        sock.write(":tmi.twitch.tv 376 "+twitchId+" :>\r\n");
-                        sock.write("\r\n");
-                }
-        });
-
-        sock.on("close", ()=>{
-                console.log("closed");
-        });
-
-}).listen(port, host);
-room.open();
-//
-//
-//end of danmu Redirect
-
 //start Web Server Defines
 //
 //
 
-var LivingProcess = function(url, code){ 
+var LivingProcess = function(tid, rid, url, code){ 
 	this.url = url;
 	this.code = code;
+	this.rid = rid;
+	this.tid = tid;
+	this.currentRoom = null;
+	this.currentTwitchClient = null;
+	this.configDanmu = new Promise((resolve,reject)=>{
+		this.currentRoom = new douyu.ChatRoom(this.rid);
+		this.currentRoom.on("chatmsg", (msg)=>{
+       			if(this.currentTwitchClient){
+               			this.currentTwitchClient.toPS4(msg.nn, msg.txt);
+       			}
+        		io.emit("message",msg.nn + ":"+msg.txt);
+		});
+		this.currentRoom.on("uenter", (msg)=>{
+        		if(this.currentTwitchClient){
+                		this.currentTwitchClient.toPS4(msg.nn, "进入直播间");
+        		}
+       			io.emit("message",msg.nn +": 进入直播间");
+		});
+		this.currentRoom.on("dgb", (msg)=>{
+			if(this.currentTwitchClient){
+				this.currentTwitchClient.toPS4(msg.sn+"送出礼物√", gift[msg.gfid]);
+			}
+			io.emit("message", msg.sn+"送出礼物√ : "+gift[msg.gfid]);
+		});
+		try{
+			this.currentRoom.open();
+			resolve();
+		}catch(e){
+			io.emit("error", e.toString());
+		}
+	});
+
+	this.configTwitchClient = new Promise((resolve, reject)=>{
+		
+		var server = net.createServer((sock)=>{
+			console.log("connected");
+        		this.currentTwitchClient = new Client(this.tid, sock);
+        		sock.on("data", (d)=>{
+                		var message = d.toString();
+                		console.log(message);
+                		if(message.indexOf("NICK") == 0){
+					this.currentTwitchClient.sendHandshake();
+                		}
+        		});
+        		sock.on("close", ()=>{
+        	        	console.log("closed");
+	        	});
+		});
+		try{
+			server.listen(port, host);
+			resolve();
+		}catch(e){
+			io.emit("error", e.toString());
+		}
+	});
 	this.prepare = new Promise((resolve, reject)=>{
 		try{
 			exec("killall nginx", (error, stdout, stderr)=>{
 				resolve();
 			});
 		}
-		catch(e){resolve();}		
+		catch(e){
+			io.emit("error", e.toString());
+		}
 	});
 	this.config = new Promise((resolve,reject)=>{
 		try{
@@ -153,16 +129,15 @@ var LivingProcess = function(url, code){
                                 +"; }}");
 			resolve();
 		}catch(e){
-			console.log(1);
-			reject(e);
+			io.emit("error", e.toString());
 		}
 	});
 
 	this.start = new Promise((resolve,reject)=>{
 		exec("/usr/local/nginx/sbin/nginx",(error, stdout, stderr)=>{
 			if(error || stderr){
-				console.log(error + "#" + stderr);
-                                reject({error:error, stderr:stderr});
+				io.emit("error", error);
+				io.emit("error", stderr);
                         }else{
                                 resolve(stdout);
                         }
