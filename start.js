@@ -30,6 +30,7 @@ var Client = function(tid, sock){
 	};
 }
 
+
 io.on("connection", (websock)=>{
         websock.emit("message", "Connected to PS4broadcast-WebRunner");
 	var lp = new LivingProcess();
@@ -205,6 +206,24 @@ app.get("/",(req,res)=>{
 	res.sendFile(__dirname+"/index.html");	
 });
 
+function test(){
+
+        var lp = new LivingProcess();
+        lp.setup("", "", "rtmp://send1a.douyu.com/live", "none")
+                          .then(lp.prepare())
+                          .then(lp.config())
+                          .then(lp.configDanmu())
+                          .then(lp.resetTwitchClient())
+                          .then(lp.configTwitchClient())
+                          .then(lp.start())
+                          .then(()=>{
+                                console.log("living");
+                        }).catch(()=>{
+                                console.log("down");
+                        });
+
+}
+//test();
 http.listen(26666);
 //
 //
