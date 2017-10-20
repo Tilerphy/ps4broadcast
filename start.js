@@ -32,13 +32,16 @@ var Client = function(tid, sock){
 
 io.on("connection", (websock)=>{
         websock.emit("message", "Connected to PS4broadcast-WebRunner");
+	var lp = new LivingProcess();
         websock.on("resetlive", (msg)=>{
-                        var lp = new LivingProcess(msg.tid, msg.rid, msg.url, msg.code);
-                        lp.prepare
-                          .then(lp.config)
-			  .then(lp.configDanmu)
-			  .then(lp.configTwitchClient)
-                          .then(lp.start)
+                        //var lp = new LivingProcess(msg.tid, msg.rid, msg.url, msg.code);
+                        lp.setup(msg.tid, msg.rid, msg.url, msg.code)
+			  .then(lp.prepare())
+                          .then(lp.config())
+			  .then(lp.configDanmu())
+			  .then(lp.resetTwitchClient())
+			  .then(lp.configTwitchClient())
+                          .then(lp.start())
                           .then(()=>{
                                 io.emit("living", true);
                         }).catch(()=>{
@@ -57,92 +60,145 @@ var LivingProcess = function(tid, rid, url, code){
 	this.tid = tid;
 	this.currentRoom = null;
 	this.currentTwitchClient = null;
-	this.configDanmu = new Promise((resolve,reject)=>{
-		this.currentRoom = new douyu.ChatRoom(this.rid);
-		this.currentRoom.on("chatmsg", (msg)=>{
-       			if(this.currentTwitchClient){
-               			this.currentTwitchClient.toPS4(msg.nn, msg.txt);
-       			}
-        		io.emit("message",msg.nn + ":"+msg.txt);
+	this.server = null;
+	this.setup= (tid, rid, url, code)=>{
+		return new Promise((resolve,reject)=>{
+			this.tid=tid;
+			this.code = code;
+			this.rid = rid;
+			this.url = url;
+			resolve();
 		});
-		this.currentRoom.on("uenter", (msg)=>{
-        		if(this.currentTwitchClient){
-                		this.currentTwitchClient.toPS4(msg.nn, "进入直播间");
-        		}
-       			io.emit("message",msg.nn +": 进入直播间");
-		});
-		this.currentRoom.on("dgb", (msg)=>{
-			if(this.currentTwitchClient){
-				this.currentTwitchClient.toPS4(msg.sn+"送出礼物√", gift[msg.gfid]);
+	};
+	this.configDanmu = ()=>{
+		return new Promise((resolve,reject)=>{
+			this.currentRoom = new douyu.ChatRoom(this.rid);
+			this.currentRoom.on("chatmsg", (msg)=>{
+       				if(this.currentTwitchClient){
+               				this.currentTwitchClient.toPS4(msg.nn, msg.txt);
+       				}
+        			io.emit("message",msg.nn + ":"+msg.txt);
+			});
+			this.currentRoom.on("uenter", (msg)=>{
+        			if(this.currentTwitchClient){
+                			this.currentTwitchClient.toPS4(msg.nn, "进入直播间");
+        			}
+       				io.emit("message",msg.nn +": 进入直播间");
+			});
+			this.currentRoom.on("dgb", (msg)=>{
+				if(this.currentTwitchClient){
+					this.currentTwitchClient.toPS4(msg.sn+"送出礼物√", gift[msg.gfid]);
+				}
+				io.emit("message", msg.sn+"送出礼物√ : "+gift[msg.gfid]);
+			});
+			try{
+				this.currentRoom.open();
+				resolve();
+			}catch(e){
+				io.emit("error", e.toString());
 			}
-			io.emit("message", msg.sn+"送出礼物√ : "+gift[msg.gfid]);
 		});
-		try{
-			this.currentRoom.open();
-			resolve();
-		}catch(e){
-			io.emit("error", e.toString());
-		}
-	});
+	}
 
-	this.configTwitchClient = new Promise((resolve, reject)=>{
-		
-		var server = net.createServer((sock)=>{
-			console.log("connected");
-        		this.currentTwitchClient = new Client(this.tid, sock);
-        		sock.on("data", (d)=>{
-                		var message = d.toString();
-                		console.log(message);
-                		if(message.indexOf("NICK") == 0){
-					this.currentTwitchClient.sendHandshake();
-                		}
-        		});
-        		sock.on("close", ()=>{
-        	        	console.log("closed");
-	        	});
+	this.resetTwitchClient =()=>{
+		return new Promise((resolve,reject)=>{
+			if(this.server && this.server.listening){
+				this.server.close(()=>{
+					resolve();
+				});
+			}else{
+				resolve();
+			}
 		});
-		try{
-			server.listen(port, host);
-			resolve();
-		}catch(e){
-			io.emit("error", e.toString());
-		}
-	});
-	this.prepare = new Promise((resolve, reject)=>{
-		try{
-			exec("killall nginx", (error, stdout, stderr)=>{
+	}
+	this.configTwitchClient = ()=>{
+		return new Promise((resolve, reject)=>{
+			this.server = net.createServer((sock)=>{
+				console.log("connected");
+        			this.currentTwitchClient = new Client(this.tid, sock);
+        			sock.on("data", (d)=>{
+                			var message = d.toString();
+                			console.log(message);
+                			if(message.indexOf("NICK") == 0){
+						this.currentTwitchClient.sendHandshake();
+                			}
+        			});
+        			sock.on("close", ()=>{
+        	        		console.log("closed");
+	        		});
+			});
+			try{
+				this.server.listen(port, host);
+				resolve();
+			}catch(e){
+				io.emit("error", e.toString());
+			}
+		});
+	}
+	this.prepare =()=>{
+		return  new Promise((resolve, reject)=>{
+			try{
+				exec("killall nginx", (error, stdout, stderr)=>{
+					resolve();
+				});
+			}
+			catch(e){
+				io.emit("error", e.toString());
+			}
+		});
+	}
+	this.config =()=>{
+		return  new Promise((resolve,reject)=>{
+			try{
+				fs.writeFileSync("/usr/local/nginx/conf/rtmp.conf.d/douyu",
+                                	"server { listen 1935; chunk_size 131072; max_message 256M; application app { live on; record off; meta copy; push "+
+                                        	this.url
+                                	+"/"+
+                                        	this.code
+                                	+"; }}");
+				resolve();
+			}catch(e){
+				io.emit("error", e.toString());
+			}
+		});
+	}
+
+	this.start =()=>{
+		return  new Promise((resolve,reject)=>{
+			exec("/usr/local/nginx/sbin/nginx",(error, stdout, stderr)=>{
+				if(error || stderr){
+					io.emit("error", error);
+					io.emit("error", stderr);
+                        	}else{
+                                	resolve(stdout);
+                        	}
+			});
+		});
+	}
+	this.startBilibili=()=>{
+		return  new Promise((resolve,reject)=>{
+			var sock = net.connect(788, "livecmt-2.bilibili.com");
+				sock.on("connect", ()=>{
+        			console.log("connected");
+			});
+			sock.on("data", (d)=>{
+        			var length = d[3];
+        			console.log(d);
+        			io.emit("message",d.slice(16).toString());
+        			io.emit("message","\n");
+			});
+
+			var dataBuffer  = Buffer.from("{\"roomid\":33671,\"uid\":123456789012345}");
+			var headerBuffer= new Buffer([0,0,0,dataBuffer.length+16,0,16,0,1,0,0,0,7,0,0,0,1]);
+			var heartBeat = new Buffer([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]);
+			var packageBuffer = Buffer.alloc(dataBuffer.length+headerBuffer.length);
+			packageBuffer = Buffer.concat([headerBuffer,dataBuffer]);
+			sock.write(packageBuffer,()=>{
+        			setInterval(()=>{sock.write(heartBeat); console.log("heartbeat");}, 30000);
 				resolve();
 			});
-		}
-		catch(e){
-			io.emit("error", e.toString());
-		}
-	});
-	this.config = new Promise((resolve,reject)=>{
-		try{
-			
-			fs.writeFileSync("/usr/local/nginx/conf/rtmp.conf.d/douyu",
-                                "server { listen 1935; chunk_size 131072; max_message 256M; application app { live on; record off; meta copy; push "+
-                                        this.url
-                                +"/"+
-                                        this.code
-                                +"; }}");
-			resolve();
-		}catch(e){
-			io.emit("error", e.toString());
-		}
-	});
-
-	this.start = new Promise((resolve,reject)=>{
-		exec("/usr/local/nginx/sbin/nginx",(error, stdout, stderr)=>{
-			if(error || stderr){
-				io.emit("error", error);
-				io.emit("error", stderr);
-                        }else{
-                                resolve(stdout);
-                        }
 		});
-	});
+	}
 };
 
 app.get("/",(req,res)=>{
