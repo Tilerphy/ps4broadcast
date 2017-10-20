@@ -1,6 +1,6 @@
 echo "install the required software......"
 apt-get update
-apt-get install -y git libpcre3-dev nodejs openssl libssl-dev gcc g++ automake zlib1g-dev make
+apt-get install -y git libpcre3-dev nodejs openssl libssl-dev gcc g++ automake zlib1g-dev make psmisc
 echo "download nginx......"
 wget http://nginx.org/download/nginx-1.12.1.tar.gz
 tar -xvf nginx-1.12.1.tar.gz
