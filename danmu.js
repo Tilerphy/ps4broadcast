@@ -1,5 +1,6 @@
 var net = require("net");
 var douyu = require("douyu");
+var gift = require("./gift");
 //roomid 应该是你的斗鱼直播房间号
 var roomid= "1035304";
 var room = new douyu.ChatRoom(roomid);
