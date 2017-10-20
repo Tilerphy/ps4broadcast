@@ -22,10 +22,10 @@
 	function loaded(){
 		
 		socket.on("message", function(m){
+			var  messages = document.getElementById("messages");
 			if(messages.scrollHeight > 5000){
 				messages.value = "";
 			}
-			var  messages = document.getElementById("messages");
 			messages.value = messages.value += m +"\n";
 			messages.scrollTo(0, messages.scrollHeight);
 		});
