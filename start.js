@@ -15,18 +15,26 @@ var Client = function(tid, sock){
         this.sock = sock;
 	this.tid = tid;
         this.toPS4 = (name, message)=>{
-                this.sock.write(":"+name+"!"+name+"@"+name+".tmi.twitch.tv PRIVMSG #"+name+" :"+message+"\r\n");
-                this.sock.write("\r\n");
+               try{
+			this.sock.write(":"+name+"!"+name+"@"+name+".tmi.twitch.tv PRIVMSG #"+name+" :"+message+"\r\n");
+                	this.sock.write("\r\n");
+		}catch(e){
+			
+		}
         };
 	this.sendHandshake =  ()=>{
-		this.sock.write(":tmi.twitch.tv 001 "+this.tid+" :Welcome, GLHF!\r\n");
-                this.sock.write(":tmi.twitch.tv 002 "+this.tid+" :Your host is tmi.twitch.tv\r\n");
-                this.sock.write(":tmi.twitch.tv 003 "+this.tid+" :This server is rather new\r\n");
-                this.sock.write(":tmi.twitch.tv 004 "+this.tid+" :-\r\n");
-                this.sock.write(":tmi.twitch.tv 375 "+this.tid+" :-\r\n");
-                this.sock.write(":tmi.twitch.tv 372 "+this.tid+" :You are in a maze of twisty passages, all alike.\r\n");
-                this.sock.write(":tmi.twitch.tv 376 "+this.tid+" :>\r\n");
-                this.sock.write("\r\n");
+		try{
+			this.sock.write(":tmi.twitch.tv 001 "+this.tid+" :Welcome, GLHF!\r\n");
+                	this.sock.write(":tmi.twitch.tv 002 "+this.tid+" :Your host is tmi.twitch.tv\r\n");
+                	this.sock.write(":tmi.twitch.tv 003 "+this.tid+" :This server is rather new\r\n");
+               		this.sock.write(":tmi.twitch.tv 004 "+this.tid+" :-\r\n");
+                	this.sock.write(":tmi.twitch.tv 375 "+this.tid+" :-\r\n");
+                	this.sock.write(":tmi.twitch.tv 372 "+this.tid+" :You are in a maze of twisty passages, all alike.\r\n");
+                	this.sock.write(":tmi.twitch.tv 376 "+this.tid+" :>\r\n");
+                	this.sock.write("\r\n");
+		}catch(e){
+
+		}
 	};
 }
 
@@ -93,10 +101,28 @@ var LivingProcess = function(tid, rid, url, code){
        				io.emit("message",msg.nn +": 进入直播间");
 			});
 			this.currentRoom.on("dgb", (msg)=>{
-				if(this.currentTwitchClient){
-					this.currentTwitchClient.toPS4(msg.nn+"送出礼物√", "");
-				}
-				io.emit("message", msg.nn+"送出礼物√ : "+ msg);
+				var douyuReq= xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/1035304",(res)=>{
+					var all = "";
+					res.on("data",(d)=>{
+						all+=d.toString();
+					});
+
+					res.on("end", ()=>{
+						var gifts = JSON.parse(all).data.gift;
+						var gift = null;
+						for(var g of gifts){
+							if(g.id == msg.gfid){
+								gift = g;
+								break;
+							}
+						}
+						if(this.currentTwitchClient){
+                                        		this.currentTwitchClient.toPS4(msg.nn+"送出礼物√", gift ==null?"":gift.name);
+                                		}
+                                		io.emit("message", msg.nn+"送出礼物√ : "+ (gift==null?"":gift.name));
+					});
+				});
+				douyuReq.end();
 			});
 			try{
 				this.currentRoom.open();
