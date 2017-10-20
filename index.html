@@ -19,8 +19,6 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 	var socket = io();
-	function loaded(){
-		
 		socket.on("message", function(m){
 			var  messages = document.getElementById("messages");
 			if(messages.scrollHeight > 5000){
@@ -38,7 +36,7 @@
 		socket.on("error", function(error){
 			console.log(error);
 		});
-	}
+	
 
 	function resetLiving(){
 		socket.emit("resetlive",{

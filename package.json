@@ -17,7 +17,6 @@
   },
   "homepage": "https://github.com/Tilerphy/ps4broadcast#readme",
   "dependencies": {
-    "douyu": "^0.1.0",
     "express": "^4.16.2",
     "socket.io": "^2.0.3"
   }

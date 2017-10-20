@@ -6,7 +6,7 @@ var xhttp = require("http");
 var io= require("socket.io")(http);
 var exec = require("child_process").exec;
 var net = require("net");
-var douyu = require("douyu");
+var douyu = require("./douyu");
 var gift = require("./gift");
 // 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
 var host = "192.168.200.1";
@@ -30,12 +30,18 @@ var Client = function(tid, sock){
 	};
 }
 
-
+var lp = null;
 io.on("connection", (websock)=>{
         websock.emit("message", "Connected to PS4broadcast-WebRunner");
-	var lp = new LivingProcess();
-        websock.on("resetlive", (msg)=>{
-                        //var lp = new LivingProcess(msg.tid, msg.rid, msg.url, msg.code);
+	websock.on("resetlive", (msg)=>{
+			if(lp && lp.server.listening){
+                        	lp.server.close();
+			}
+
+			if(lp && lp.currentRoom){
+				lp.currentRoom.close();
+			}
+			lp = new LivingProcess();
                         lp.setup(msg.tid, msg.rid, msg.url, msg.code)
 			  .then(lp.prepare())
                           .then(lp.config())
@@ -88,9 +94,9 @@ var LivingProcess = function(tid, rid, url, code){
 			});
 			this.currentRoom.on("dgb", (msg)=>{
 				if(this.currentTwitchClient){
-					this.currentTwitchClient.toPS4(msg.sn+"送出礼物√", gift[msg.gfid]);
+					this.currentTwitchClient.toPS4(msg.nn+"送出礼物√", "");
 				}
-				io.emit("message", msg.sn+"送出礼物√ : "+gift[msg.gfid]);
+				io.emit("message", msg.nn+"送出礼物√ : "+ msg);
 			});
 			try{
 				this.currentRoom.open();
