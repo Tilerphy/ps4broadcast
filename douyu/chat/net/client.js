@@ -19,6 +19,10 @@ Client.prototype.init = function(){
 	this.messageBuffer = '';
 };
 
+Client.prototype.close = function(){
+	this.removeAllListeners();
+}
+
 Client.prototype.connect = function(){
 	this.s = new net.Socket();
 	this.s.setEncoding('hex');

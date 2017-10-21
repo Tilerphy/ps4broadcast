@@ -20,6 +20,7 @@ Room.prototype.open = function(){
 
 Room.prototype.close = function(){
 	this.removeAllListeners();
+	this.client.close();
 	clearInterval(this.intervalId);
 }
 
