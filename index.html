@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>PS4Broadcast Control Panel v0.1</title>
   </head>
-<body onload="loaded()">
+<body>
 <p>Twitch Id:</p>
 <input type="textbox" id="tid" style="width:30%">
 <p>Douyu Room Id:</p>
@@ -25,7 +25,7 @@
 				messages.value = "";
 			}
 			messages.value = messages.value += m +"\n";
-			messages.scrollTo(0, messages.scrollHeight);
+			messages.scrollTop = messages.scrollHeight;
 		});
 
 		socket.on("living", function(status){

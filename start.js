@@ -11,6 +11,34 @@ var gift = require("./gift");
 // 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
 var host = "192.168.200.1";
 var port = 6667;
+// 额外模块加载与使用
+var modules = [];
+var moduleFiles = fs.readdirSync(__dirname+"/modules");
+for(var mf of moduleFiles){
+	if(mf.indexOf("_") == 0){
+		console.log(mf+" is loaded.");
+		modules[modules.length] = require(__dirname+"/modules/"+mf);
+	}
+}
+
+// 调用额外模块
+function m(arg){
+	return new Promise((resolve, reject)=>{
+		try{
+			for(var module of modules){
+                		if(module.invoke){
+                        		module.invoke(arg);
+                		}
+        		}
+			resolve();
+		}catch(e){
+			reject(e);
+		}	
+	});
+}
+//
+//
+//
 var Client = function(tid, sock){
         this.sock = sock;
 	this.tid = tid;
@@ -93,6 +121,7 @@ var LivingProcess = function(tid, rid, url, code){
                				this.currentTwitchClient.toPS4(msg.nn, msg.txt);
        				}
         			io.emit("message",msg.nn + ":"+msg.txt);
+				m(msg.txt);
 			});
 			this.currentRoom.on("uenter", (msg)=>{
         			if(this.currentTwitchClient){
