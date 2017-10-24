@@ -7,7 +7,12 @@
 <body>
 <p>Twitch Id:</p>
 <input type="textbox" id="tid" style="width:30%">
-<p>Douyu Room Id:</p>
+<p>Room Type:</p>
+<select id="type" style="width:30%">
+<option value="douyu">斗鱼</option>
+<option value="bilibili">Bilibili</option>
+<select>
+<p>Room Id:</p>
 <input type="textbox" id="rid" style="width:30%">
 <p>URL:</p>
 <input type="textbox" id="url" style="width:30%">
@@ -38,6 +43,10 @@
 			document.getElementById("tid").value=lp.tid;
 			document.getElementById("rid").value=lp.rid;
 			document.getElementById("url").value=lp.url;
+			var selected = document.getElementById(lp.type);
+			if(selected){
+				selected.selected = "selected";
+			}
 		});
 		socket.on("error", function(error){
 			console.log(error);
@@ -54,7 +63,8 @@
 					tid:document.getElementById("tid").value,
 					rid:document.getElementById("rid").value,
 					url:document.getElementById("url").value, 
-					code:document.getElementById("code").value});
+					code:document.getElementById("code").value,
+					type:document.getElementById("type").options[document.getElementById("type").selectedIndex].value});
 	}
 </script>
 </body>

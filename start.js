@@ -14,11 +14,18 @@ var host = "192.168.200.1";
 var port = 6667;
 // 额外模块加载与使用
 var modules = [];
+var roomModules ={};
 var moduleFiles = fs.readdirSync(__dirname+"/modules");
 for(var mf of moduleFiles){
 	if(mf.indexOf("_") == 0){
 		console.log(mf+" is loaded.");
 		modules[modules.length] = require(__dirname+"/modules/"+mf);
+	}
+
+	if(mf.indexOf("room_") == 0){
+		console.log(mf+" is loaded as room module.");
+		var rmodule = require(__dirname+"/modules/"+mf);
+		roomModules[rmodule.type] = rmodule;
 	}
 }
 
@@ -82,7 +89,7 @@ io.on("connection", (websock)=>{
 				lp.currentRoom.close();
 			}
 			lp = new LivingProcess();
-                        lp.setup(msg.tid, msg.rid, msg.url, msg.code)
+                        lp.setup(msg.tid, msg.rid, msg.url, msg.code, msg.type)
 			  .then(lp.prepare())
                           .then(lp.config())
 			  .then(lp.configDanmu())
@@ -90,9 +97,9 @@ io.on("connection", (websock)=>{
 			  .then(lp.configTwitchClient())
                           .then(lp.start())
                           .then(()=>{
-                                io.emit("living", true);
+                                io.emit("living", msg.type);
                         }).catch(()=>{
-                                io.emit("living",false);
+                                io.emit("living", false);
                         });
         });
 
@@ -108,8 +115,10 @@ io.on("connection", (websock)=>{
 //start Web Server Defines
 //
 //
-
-var LivingProcess = function(tid, rid, url, code){ 
+var openRoom = function(rid, type, webIO, ps4){
+	return new roomModules[type].init(rid, webIO, ps4);
+}
+var LivingProcess = function(tid, rid, url, code, type){ 
 	this.url = url;
 	this.code = code;
 	this.rid = rid;
@@ -117,64 +126,23 @@ var LivingProcess = function(tid, rid, url, code){
 	this.currentRoom = null;
 	this.currentTwitchClient = null;
 	this.server = null;
-	this.setup= (tid, rid, url, code)=>{
+	this.type=type;
+	this.setup= (tid, rid, url, code, type)=>{
 		return new Promise((resolve,reject)=>{
 			this.tid=tid;
 			this.code = code;
 			this.rid = rid;
 			this.url = url;
+			this.type=type;
 			fs.writeFileSync(__dirname+"/lp.data", JSON.stringify({tid:tid, rid:rid, url: url}));
 			resolve();
 		});
 	};
 	this.configDanmu = ()=>{
 		return new Promise((resolve,reject)=>{
-			this.currentRoom = new douyu.ChatRoom(this.rid);
-			this.currentRoom.on("chatmsg", (msg)=>{
-       				if(this.currentTwitchClient){
-               				this.currentTwitchClient.toPS4(msg.nn, msg.txt);
-       				}
-        			io.emit("message",msg.nn + ":"+msg.txt);
-				m(msg.txt);
-			});
-			this.currentRoom.on("uenter", (msg)=>{
-        			if(this.currentTwitchClient){
-                			this.currentTwitchClient.toPS4(msg.nn, "进入直播间");
-        			}
-       				io.emit("message",msg.nn +": 进入直播间");
-			});
-			this.currentRoom.on("dgb", (msg)=>{
-				var douyuReq= xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/"+this.rid, (res)=>{
-					var all = "";
-					res.on("data",(d)=>{
-						all+=d.toString();
-					});
-
-					res.on("end", ()=>{
-						var gifts = JSON.parse(all).data.gift;
-						var gift = null;
-						if(gifts){
-							for(var g of gifts){
-								if(g.id == msg.gfid){
-									gift = g;
-									break;
-								}
-							}
-						}
-						if(this.currentTwitchClient){
-                                        		this.currentTwitchClient.toPS4(msg.nn+"送出礼物√", gift ==null?"":gift.name);
-                                		}
-                                		io.emit("message", msg.nn+"送出礼物√ "+ (gift==null?"":gift.name));
-					});
-				});
-				douyuReq.end();
-			});
-			try{
-				this.currentRoom.open();
-				resolve();
-			}catch(e){
-				io.emit("error", e.toString());
-			}
+			console.log(this.type+" is living.");
+			this.currentRoom = openRoom(this.rid, this.type, io, this.currentTwitchClient);
+			resolve();
 		});
 	}
 
@@ -253,30 +221,6 @@ var LivingProcess = function(tid, rid, url, code){
 			});
 		});
 	}
-	this.startBilibili=()=>{
-		return  new Promise((resolve,reject)=>{
-			var sock = net.connect(788, "livecmt-2.bilibili.com");
-				sock.on("connect", ()=>{
-        			console.log("connected");
-			});
-			sock.on("data", (d)=>{
-        			var length = d[3];
-        			console.log(d);
-        			io.emit("message",d.slice(16).toString());
-        			io.emit("message","\n");
-			});
-
-			var dataBuffer  = Buffer.from("{\"roomid\":33671,\"uid\":123456789012345}");
-			var headerBuffer= new Buffer([0,0,0,dataBuffer.length+16,0,16,0,1,0,0,0,7,0,0,0,1]);
-			var heartBeat = new Buffer([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]);
-			var packageBuffer = Buffer.alloc(dataBuffer.length+headerBuffer.length);
-			packageBuffer = Buffer.concat([headerBuffer,dataBuffer]);
-			sock.write(packageBuffer,()=>{
-        			setInterval(()=>{sock.write(heartBeat); console.log("heartbeat");}, 30000);
-				resolve();
-			});
-		});
-	}
 };
 
 app.get("/",(req,res)=>{
@@ -286,7 +230,7 @@ app.get("/",(req,res)=>{
 function test(){
 
         var lp = new LivingProcess();
-        lp.setup("", "", "rtmp://send1a.douyu.com/live", "none")
+        lp.setup("", "1035304", "rtmp://send1a.douyu.com/live", "none", "douyu")
                           .then(lp.prepare())
                           .then(lp.config())
                           .then(lp.configDanmu())
