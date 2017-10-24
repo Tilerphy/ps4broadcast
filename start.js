@@ -1,3 +1,4 @@
+var version = require("./version");
 var fs =require("fs");
 var express= require("express");
 var app = express();
@@ -68,7 +69,7 @@ var Client = function(tid, sock){
 
 var lp = null;
 io.on("connection", (websock)=>{
-        websock.emit("message", "Connected to PS4broadcast-WebRunner");
+        websock.emit("message", "Connected to PS4broadcast-WebRunner v"+version);
 	websock.on("resetlive", (msg)=>{
 			if(lp && lp.server.listening){
                         	lp.server.close();
