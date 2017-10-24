@@ -1,4 +1,5 @@
 basepath=$(cd `dirname $0`; pwd)
+cd $basepath
 iptables -t nat -F
 ifconfig $1:2 192.168.200.1 netmask 255.255.255.0
 sysctl -w net.ipv4.ip_forward=1

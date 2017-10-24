@@ -13,7 +13,7 @@
 <input type="textbox" id="url" style="width:30%">
 <p>CODE:</p>
 <input type="textbox" id="code" style="width:30%"><input type="button" value="Reset Living" onclick="resetLiving()">
-<input type="button" value="Restart" onclick="restart()">
+<input type="button" value="Update & Restart" onclick="updateandrestart()">
 <p>Messages:</p>
 <textarea id="messages" style="width:100%;height:400px">
 </textarea>
@@ -43,9 +43,8 @@
 			console.log(error);
 		});
 
-	function restart(){
-		socket.emit("restart");
-		window.location.href="/";
+	function updateandrestart(){
+		socket.emit("updateandrestart");
 	}
 
 	function resetLiving(){

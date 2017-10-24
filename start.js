@@ -96,8 +96,13 @@ io.on("connection", (websock)=>{
                         });
         });
 
-	websock.on("restart", ()=>{
-		exec("reboot");
+	websock.on("updateandrestart", ()=>{
+		exec("git pull origin master && reboot", (error, stdout, stderr)=>{
+			if(error || stderr){
+				console.log(error);
+				console.log(stderr);
+			}
+		});
 	});
 });
 //start Web Server Defines
