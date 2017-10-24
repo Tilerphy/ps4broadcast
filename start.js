@@ -110,16 +110,18 @@ var LivingProcess = function(tid, rid, url, code){
 					res.on("end", ()=>{
 						var gifts = JSON.parse(all).data.gift;
 						var gift = null;
-						for(var g of gifts){
-							if(g.id == msg.gfid){
-								gift = g;
-								break;
+						if(gifts){
+							for(var g of gifts){
+								if(g.id == msg.gfid){
+									gift = g;
+									break;
+								}
 							}
 						}
 						if(this.currentTwitchClient){
                                         		this.currentTwitchClient.toPS4(msg.nn+"送出礼物√", gift ==null?"":gift.name);
                                 		}
-                                		io.emit("message", msg.nn+"送出礼物√ : "+ (gift==null?"":gift.name));
+                                		io.emit("message", msg.nn+"送出礼物√ "+ (gift==null?"":gift.name));
 					});
 				});
 				douyuReq.end();
