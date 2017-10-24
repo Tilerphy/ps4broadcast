@@ -101,7 +101,7 @@ var LivingProcess = function(tid, rid, url, code){
        				io.emit("message",msg.nn +": 进入直播间");
 			});
 			this.currentRoom.on("dgb", (msg)=>{
-				var douyuReq= xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/1035304",(res)=>{
+				var douyuReq= xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/"+this.rid, (res)=>{
 					var all = "";
 					res.on("data",(d)=>{
 						all+=d.toString();
