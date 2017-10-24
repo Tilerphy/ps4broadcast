@@ -39,6 +39,8 @@
 	
 
 	function resetLiving(){
+		var  messages = document.getElementById("messages");
+		messages.value = "";
 		socket.emit("resetlive",{
 					tid:document.getElementById("tid").value,
 					rid:document.getElementById("rid").value,
