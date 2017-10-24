@@ -77,7 +77,7 @@ sudo chmod 777 start-web.sh
 执行安装脚本
 ```
 sudo ./install.sh
-
+sudo npm install
 ```
 
 # 开始直播？
