@@ -70,6 +70,9 @@ var Client = function(tid, sock){
 var lp = null;
 io.on("connection", (websock)=>{
         websock.emit("message", "Connected to PS4broadcast-WebRunner v"+version);
+	if(fs.existsSync(__dirname+"/lp.data")){
+		websock.emit("lastState", JSON.parse(fs.readFileSync(__dirname+"/lp.data")));
+	}
 	websock.on("resetlive", (msg)=>{
 			if(lp && lp.server.listening){
                         	lp.server.close();
@@ -92,6 +95,10 @@ io.on("connection", (websock)=>{
                                 io.emit("living",false);
                         });
         });
+
+	websock.on("restart", ()=>{
+		exec("reboot");
+	});
 });
 //start Web Server Defines
 //
@@ -111,6 +118,7 @@ var LivingProcess = function(tid, rid, url, code){
 			this.code = code;
 			this.rid = rid;
 			this.url = url;
+			fs.writeFileSync(__dirname+"/lp.data", JSON.stringify({tid:tid, rid:rid, url: url}));
 			resolve();
 		});
 	};
