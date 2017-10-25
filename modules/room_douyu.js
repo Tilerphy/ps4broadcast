@@ -4,7 +4,9 @@ function init(rid, io, lp){
 	this.rid = rid;
 	this.lp= lp;
 	this.currentRoom = new douyu.ChatRoom(this.rid);
-	this.close = this.currentRoom.close;
+	this.close = ()=>{
+		this.currentRoom.close();
+	}
 	this.currentRoom.on("chatmsg", (msg)=>{
        		if(this.lp.currentTwitchClient){
                		this.lp.currentTwitchClient.toPS4(msg.nn, msg.txt);
