@@ -92,9 +92,9 @@ io.on("connection", (websock)=>{
                         lp.setup(msg.tid, msg.rid, msg.url, msg.code, msg.type)
 			  .then(lp.prepare())
                           .then(lp.config())
-			  .then(lp.configDanmu())
 			  .then(lp.resetTwitchClient())
 			  .then(lp.configTwitchClient())
+		   	  .then(lp.configDanmu())
                           .then(lp.start())
                           .then(()=>{
                                 io.emit("living", msg.type);
