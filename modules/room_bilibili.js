@@ -10,7 +10,7 @@ var init = function (rid, io, ps4){
         });
         sock.on("data", (d)=>{
                 popBilibiliMsg(d, (msg)=>{
-			console.log(this.ps4);
+			console.log("Here:"+ this.ps4);
                 	switch(msg.cmd){
 				case "DANMU_MSG":
 					if(this.ps4){
