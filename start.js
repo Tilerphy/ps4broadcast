@@ -167,6 +167,7 @@ var LivingProcess = function(tid, rid, url, code, type){
                 			console.log(message);
                 			if(message.indexOf("NICK") == 0){
 						this.currentTwitchClient.sendHandshake();
+						resolve();
                 			}
         			});
         			sock.on("close", ()=>{
@@ -175,7 +176,6 @@ var LivingProcess = function(tid, rid, url, code, type){
 			});
 			try{
 				this.server.listen(port, host);
-				resolve();
 			}catch(e){
 				io.emit("error", e.toString());
 			}
