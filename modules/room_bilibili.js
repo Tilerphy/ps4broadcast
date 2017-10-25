@@ -2,6 +2,7 @@ var net = require("net");
 var init = function (rid, io, ps4){
 	this.uid = 123456789012345 + parseInt(1000000000000000*Math.random());
 	this.rid = rid;
+	this.ps4 = ps4;
 	this.interval = null; 
 	var sock = net.connect(788, "livecmt-2.bilibili.com");
         sock.on("connect", ()=>{
@@ -9,22 +10,23 @@ var init = function (rid, io, ps4){
         });
         sock.on("data", (d)=>{
                 popBilibiliMsg(d, (msg)=>{
+			console.log(this.ps4);
                 	switch(msg.cmd){
 				case "DANMU_MSG":
-					if(ps4){
-						ps4.toPS4(msg.info[2][1], msg.info[1]);
+					if(this.ps4){
+						this.ps4.toPS4(msg.info[2][1], msg.info[1]);
 					}
 					io.emit("message", msg.info[2][1]+": "+msg.info[1]);
 					break;
 				case "SEND_GIFT":
-					if(ps4){
-						ps4.toPS4(msg.data.uname+"送出礼物√", msg.data.giftName);
+					if(this.ps4){
+						this.ps4.toPS4(msg.data.uname+"送出礼物√", msg.data.giftName);
 					}
 					io.emit("message", msg.data.uname+"送出礼物√："+msg.data.giftName);
 					break;
 				case "WELCOME":
-					if(ps4){
-						ps4.toPS4(msg.data.uanme, "进入直播间");
+					if(this.ps4){
+						this.ps4.toPS4(msg.data.uanme, "进入直播间");
 					}
 					io.emit("message", msg.data.uname+"进入直播间");
 					break;
