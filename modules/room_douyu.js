@@ -1,19 +1,19 @@
 var xhttp = require("http");
 var douyu = require("../douyu");
-function init(rid, io, ps4){
+function init(rid, io, lp){
 	this.rid = rid;
-	this.ps4=ps4;
+	this.lp= lp;
 	this.currentRoom = new douyu.ChatRoom(this.rid);
 	this.close = this.currentRoom.close;
 	this.currentRoom.on("chatmsg", (msg)=>{
-       		if(this.ps4){
-               		this.ps4.toPS4(msg.nn, msg.txt);
+       		if(this.lp.currentTwitchClient){
+               		this.lp.currentTwitchClient.toPS4(msg.nn, msg.txt);
        		}
         	io.emit("message",msg.nn + ":"+msg.txt);
 	});
 	this.currentRoom.on("uenter", (msg)=>{
-        	if(this.ps4){
-                	this.ps4.toPS4(msg.nn, "进入直播间");
+        	if(this.lp.currentTwitchClient){
+                	this.lp.currentTwitchClient.toPS4(msg.nn, "进入直播间");
         	}
        		io.emit("message",msg.nn +": 进入直播间");
 	});
@@ -35,8 +35,8 @@ function init(rid, io, ps4){
 						}
 					}
 				}
-				if(this.ps4){
-                                        this.ps4.toPS4(msg.nn+"送出礼物√", gift ==null?"":gift.name);
+				if(this.lp.currentTwitchClient){
+                                        this.lp.currentTwitchClient.toPS4(msg.nn+"送出礼物√", gift ==null?"":gift.name);
                                 }
                                 io.emit("message", msg.nn+"送出礼物√ "+ (gift==null?"":gift.name));
 			});

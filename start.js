@@ -141,7 +141,7 @@ var LivingProcess = function(tid, rid, url, code, type){
 	this.configDanmu = ()=>{
 		return new Promise((resolve,reject)=>{
 			console.log(this.type+" is living.");
-			this.currentRoom = openRoom(this.rid, this.type, io, this.currentTwitchClient);
+			this.currentRoom = openRoom(this.rid, this.type, io, this);
 			resolve();
 		});
 	}
@@ -167,7 +167,6 @@ var LivingProcess = function(tid, rid, url, code, type){
                 			console.log(message);
                 			if(message.indexOf("NICK") == 0){
 						this.currentTwitchClient.sendHandshake();
-						resolve();
                 			}
         			});
         			sock.on("close", ()=>{
@@ -176,6 +175,7 @@ var LivingProcess = function(tid, rid, url, code, type){
 			});
 			try{
 				this.server.listen(port, host);
+				resolve();
 			}catch(e){
 				io.emit("error", e.toString());
 			}
