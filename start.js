@@ -231,6 +231,7 @@ app.use((req,res,next)=>{
 app.get("/",(req,res)=>{
 	res.sendFile(__dirname+"/index.html");	
 });
+
 app.get("/t/:psnid",(req,res)=>{
 	var psnid = req.params.psnid;
 	var opt ={
@@ -258,25 +259,27 @@ app.get("/t/:psnid",(req,res)=>{
 	
 });
 app.get("/tjs/:psnid", (req,res)=>{
-	var js = 'function checkT(psnid){'+
+	res.setHeader("Content-Type","application/javascript; charset=utf-8");
+	var js = 'var lastTrophies=null; function checkT(psnid){'+
         		' $.ajax({'+
                 		' type:"get",'+
                 		' url: "http://192.168.88.139:26666/t/"+psnid,'+
                 		' success:  function(resp){'+
+				' var newTrophies = resp["trophies"];'+
                         ' if(lastTrophies){'+
                                 ' var message = "";'+
-                                ' var newTrophies = resp["trophies"];'+
+				' console.log(newTrophies); console.log("lastTrophies");'+
                                 ' if(newTrophies["bronze"] != lastTrophies["bronze"]){'+
-                                '        sendToDouyu("主播从当前游戏获得"+(parseInt(newTrophies["bronze"])- parseInt(lastTrophies["bronze"]))+"个铜杯。");'+
+                                '        sendToDouyu("主播从当前游戏获得 "+(parseInt(newTrophies["bronze"])- parseInt(lastTrophies["bronze"]))+" 个铜杯。");'+
                                 ' }'+
                                 ' if(newTrophies["gold"] != lastTrophies["gold"]){'+
-                                '        sendToDouyu("主播从当前游戏获得"+(parseInt(newTrophies["gold"])- parseInt(lastTrophies["gold"]))+"个金杯。");'+
+                                '        sendToDouyu("主播从当前游戏获得 "+(parseInt(newTrophies["gold"])- parseInt(lastTrophies["gold"]))+" 个金杯。");'+
                                 ' }'+
                                 ' if(newTrophies["silver"] != lastTrophies["silver"]){'+
-                                '        sendToDouyu("主播从当前游戏获得"+(parseInt(newTrophies["silver"])- parseInt(lastTrophies["silver"]))+"个银杯。");'+
+                                '        sendToDouyu("主播从当前游戏获得 "+(parseInt(newTrophies["silver"])- parseInt(lastTrophies["silver"]))+" 个银杯。");'+
                                 ' }'+
                                 ' if(newTrophies["platinum"] != lastTrophies["platinum"]){'+
-                                '        sendToDouyu("主播从当前游戏获得"+(parseInt(newTrophies["platinum"])- parseInt(lastTrophies["platinum"]))+"个白金奖杯！");'+
+                                '        sendToDouyu("主播从当前游戏获得 "+(parseInt(newTrophies["platinum"])- parseInt(lastTrophies["platinum"]))+" 个白金奖杯！");'+
                                 ' }'+
                         ' }'+
                         ' lastTrophies = newTrophies;'+
