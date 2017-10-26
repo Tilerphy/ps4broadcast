@@ -286,7 +286,7 @@ app.get("/tjs/:psnid", (req,res)=>{
                 	' }'+
         		' });'+
 		' }'+
-	   	' function sendToDouyu(message){$(".cs-textarea").val(message);$(".b-btn").click();}'+ 	
+	   	' function sendToDouyu(message){$(".cs-textarea").val(message);$("#danmu-textbox").val(message);$(".b-btn").click();$("#danmu-send-btn").click();}'+ 	
 		' setInterval(function(){'+
         		' checkT("'+ req.params["psnid"] +'");'+
 		' }, 10000);';
