@@ -4,6 +4,7 @@ var express= require("express");
 var app = express();
 var http = require("http").Server(app);
 var xhttp = require("http");
+var xhttps =require("https");
 var io= require("socket.io")(http);
 var exec = require("child_process").exec;
 var net = require("net");
@@ -222,11 +223,72 @@ var LivingProcess = function(tid, rid, url, code, type){
 		});
 	}
 };
-
+app.use("/js",express.static("extends"));
+app.use((req,res,next)=>{
+	res.setHeader("Access-Control-Allow-Origin","*");
+	next();
+});
 app.get("/",(req,res)=>{
 	res.sendFile(__dirname+"/index.html");	
 });
+app.get("/t/:psnid",(req,res)=>{
+	var psnid = req.params.psnid;
+	var opt ={
+		hostname: "io.playstation.com",
+		path: "/playstation/psn/profile/public/userData?onlineId="+psnid,
+		method:"get",
+		headers:{
+			"Referer":"https://www.playstation.com/en-us/my/public-trophies/"
+		}
+	};
+	var xreq = xhttps.request(opt, (xres)=>{
+		var all = "";
+		xres.on("data", (d)=>{
+			all+=d.toString();
+		});
+		xres.on("end",()=>{
+			res.json(JSON.parse(all.trim()));
+			res.end();
+		});
+	});
+	xreq.on("error", ()=>{
+		res.end("error");
+	});
+	xreq.end();
+	
+});
+app.get("/tjs/:psnid", (req,res)=>{
+	var js = 'function checkT(psnid){'+
+        		' $.ajax({'+
+                		' type:"get",'+
+                		' url: "http://192.168.88.139:26666/t/"+psnid,'+
+                		' success:  function(resp){'+
+                        ' if(lastTrophies){'+
+                                ' var message = "";'+
+                                ' var newTrophies = resp["trophies"];'+
+                                ' if(newTrophies["bronze"] != lastTrophies["bronze"]){'+
+                                '        message += "";'+
+                                ' }'+
+                                ' if(newTrophies["gold"] != lastTrophies["gold"]){'+
+                                '        message+= "";'+
+                                ' }'+
+                                ' if(newTrophies["silver"] != lastTrophies["silver"]){'+
+                                '        message += "";'+
+                                ' }'+
+                                ' if(newTrophies["platinum"] != lastTrophies["platinum"]){'+
+                                '        message += "";'+
+                                ' }'+
+                        ' }'+
+                        ' lastTrophies = newTrophies;'+
+                	' }'+
+        		' });'+
+		' }'+
+		' setInterval(function(){'+
+        		' checkT("'+ req.params["psnid"] +'");'+
+		' }, 10000);';
+	res.end(js);
 
+});
 function test(){
 
         var lp = new LivingProcess();
