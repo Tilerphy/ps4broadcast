@@ -196,7 +196,7 @@ var LivingProcess = function(tid, items){
         this.config =()=>{
                 return  new Promise((resolve,reject)=>{
                         try{
-                                var fileContent = "server { listen 1935; chunk_size 131072; max_message 256M; \n application app { live on; record off; meta copy; \n";
+                                var fileContent = "server { listen 1935; chunk_size 10240; max_message 8M; \n application app { live on; record off; meta copy; \n";
                                 for(var item of this.items){
                                         fileContent += "push "+
                                                         item.url
