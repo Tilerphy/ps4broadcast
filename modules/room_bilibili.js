@@ -13,19 +13,19 @@ var init = function (rid, io, lp){
                 	switch(msg.cmd){
 				case "DANMU_MSG":
 					if(this.lp.currentTwitchClient){
-						this.lp.currentTwitchClient.toPS4('[B]'+msg.info[2][1], msg.info[1]);
+						this.lp.currentTwitchClient.toPS4(msg.info[2][1], msg.info[1]);
 					}
 					io.emit("message", '[B]'+msg.info[2][1]+": "+msg.info[1]);
 					break;
 				case "SEND_GIFT":
 					if(this.lp.currentTwitchClient){
-						this.lp.currentTwitchClient.toPS4('[B]'+msg.data.uname+"送出礼物√", msg.data.giftName);
+						this.lp.currentTwitchClient.toPS4(msg.data.uname+"送出礼物√", msg.data.giftName);
 					}
 					io.emit("message",'[B]'+msg.data.uname+"送出礼物√："+msg.data.giftName);
 					break;
 				case "WELCOME":
 					if(this.lp.currentTwitchClient){
-						this.lp.currentTwitchClient.toPS4('[B]'+msg.data.uanme, "进入直播间");
+						this.lp.currentTwitchClient.toPS4(msg.data.uanme, "进入直播间");
 					}
 					io.emit("message", '[B]'+msg.data.uname+"进入直播间");
 					break;
