@@ -50,9 +50,10 @@
 		});
 			
 		socket.on("lastState", function(lp){
+			$("#rooms").html("");
 			if(lp && lp.items){
 				for(var l in lp.items){
-					addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type);
+					addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type, lp.items[l].code);
 				}
 				$("#tid").val(lp.tid);
 			}
@@ -63,7 +64,7 @@
 
 	var roomSeq = -1;
 	var roomsKey = [];
-	function addMore(rid,url,type){
+	function addMore(rid,url,type,code){
 		roomSeq ++;
 		var n = $('<p id="_'+roomSeq+'">Room Type:'+
 					'<select id="type_'+roomSeq+'" style="width:10%">'+
@@ -75,7 +76,7 @@
 					'URL:'+
 					'<input type="textbox" id="url_'+roomSeq+'" style="width:10%" value="'+(url ? url: '')+'">'+
 					'CODE:'+
-					'<input type="textbox" id="code_'+roomSeq+'" style="width:10%"><button onclick="removeRoom(\''+roomSeq+'\')">-</button></p>');
+					'<input type="textbox" id="code_'+roomSeq+'" style="width:10%" value="'+(code? code:'')+'"><button onclick="removeRoom(\''+roomSeq+'\')">-</button></p>');
 		$("#rooms").append(n);
 		roomsKey[roomsKey.length] = roomSeq;
 	}

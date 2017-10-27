@@ -9,7 +9,6 @@ var io= require("socket.io")(http);
 var exec = require("child_process").exec;
 var net = require("net");
 var douyu = require("./douyu");
-var gift = require("./gift");
 // 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
 var host = "192.168.200.1";
 var port = 6667;
@@ -102,7 +101,7 @@ io.on("connection", (websock)=>{
                           .then(lp.configDanmu())
                           .then(lp.start())
                           .then(()=>{
-                                io.emit("living", JSON.stringify(msg.items));
+                                io.emit("living", msg.items.length + " channels.");
                         }).catch(()=>{
                                 io.emit("living", false);
                         });
