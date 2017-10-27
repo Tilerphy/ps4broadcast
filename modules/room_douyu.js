@@ -9,18 +9,18 @@ function init(rid, io, lp, invokeModules){
 	}
 	this.currentRoom.on("chatmsg", (msg)=>{
        		if(this.lp.currentTwitchClient){
-               		this.lp.currentTwitchClient.toPS4(msg.nn, msg.txt);
+               		this.lp.currentTwitchClient.toPS4('[D]'+msg.nn, msg.txt);
        		}
 		if(invokeModules){
 			invokeModules(msg.txt);
 		}
-        	io.emit("message",msg.nn + ":"+msg.txt);
+        	io.emit("message",'[D]'+msg.nn + ":"+msg.txt);
 	});
 	this.currentRoom.on("uenter", (msg)=>{
         	if(this.lp.currentTwitchClient){
-                	this.lp.currentTwitchClient.toPS4(msg.nn, "进入直播间");
+                	this.lp.currentTwitchClient.toPS4('[D]'+msg.nn, "进入直播间");
         	}
-       		io.emit("message",msg.nn +": 进入直播间");
+       		io.emit("message",'[D]'+msg.nn +": 进入直播间");
 	});
 	this.currentRoom.on("dgb", (msg)=>{
 		var douyuReq= xhttp.request("http://open.douyucdn.cn/api/RoomApi/room/"+this.rid, (res)=>{
@@ -41,16 +41,15 @@ function init(rid, io, lp, invokeModules){
 					}
 				}
 				if(this.lp.currentTwitchClient){
-                                        this.lp.currentTwitchClient.toPS4(msg.nn+"送出礼物√", gift ==null?"":gift.name);
+                                        this.lp.currentTwitchClient.toPS4('[D]'+msg.nn+"送出礼物√", gift ==null?"":gift.name);
                                 }
-                                io.emit("message", msg.nn+"送出礼物√ "+ (gift==null?"":gift.name));
+                                io.emit("message", '[D]'+msg.nn+"送出礼物√ "+ (gift==null?"":gift.name));
 			});
 		});
 		douyuReq.end();
 	});
 	try{
 		this.currentRoom.open();
-		resolve();
 	}catch(e){
 		io.emit("error", e.toString());
 	}

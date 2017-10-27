@@ -7,7 +7,9 @@
 <body>
 <p>Twitch Id:</p>
 <input type="textbox" id="tid" style="width:30%">
-<p>Room Type:</p>
+<div id="rooms"></div>
+<p><button onclick="addMore()">+</button></p>
+<!--<p>Room Type:</p>
 <select id="type" style="width:30%">
 <option value="douyu">斗鱼</option>
 <option value="bilibili">Bilibili</option>
@@ -17,13 +19,21 @@
 <p>URL:</p>
 <input type="textbox" id="url" style="width:30%">
 <p>CODE:</p>
-<input type="textbox" id="code" style="width:30%"><input type="button" value="Reset Living" onclick="resetLiving()">
-<input type="button" value="Update & Restart" onclick="updateandrestart()">
+<input type="textbox" id="code" style="width:30%">-->
+<p><input type="button" value="Reset Living" onclick="resetLiving()">
+<input type="button" value="Update & Restart" onclick="updateandrestart()"></p>
 <p>Messages:</p>
 <textarea id="messages" style="width:100%;height:400px">
 </textarea>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/js/jquery-3.2.1.min.js"></script>
 <script>
+	Element.prototype.remove = function() {
+    		this.parentElement.removeChild(this);
+	}
+	function Id(id){
+		return document.getElementById(id);
+	}
 	var socket = io();
 		socket.on("message", function(m){
 			var  messages = document.getElementById("messages");
@@ -40,17 +50,39 @@
 		});
 			
 		socket.on("lastState", function(lp){
-			document.getElementById("tid").value=lp.tid;
-			document.getElementById("rid").value=lp.rid;
-			document.getElementById("url").value=lp.url;
-			var selected = document.getElementById(lp.type);
-			if(selected){
-				selected.selected = "selected";
+			if(lp && lp.items){
+				for(var l in lp.items){
+					addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type);
+				}
+				$("#tid").val(lp.tid);
 			}
 		});
 		socket.on("error", function(error){
 			console.log(error);
 		});
+
+	var roomSeq = -1;
+	var roomsKey = [];
+	function addMore(rid,url,type){
+		roomSeq ++;
+		var n = $('<p id="_'+roomSeq+'">Room Type:'+
+					'<select id="type_'+roomSeq+'" style="width:10%">'+
+					'<option value="douyu" '+ (type=='douyu'?'selected':'') +'>斗鱼</option>'+
+					'<option value="bilibili" '+ (type=='bilibili'?'selected':'') +'>Bilibili</option>'+
+					'<select>'+
+					'Room Id:'+
+					'<input type="textbox" id="rid_'+roomSeq+'" style="width:10%" value="'+(rid ? rid : '')+'">'+
+					'URL:'+
+					'<input type="textbox" id="url_'+roomSeq+'" style="width:10%" value="'+(url ? url: '')+'">'+
+					'CODE:'+
+					'<input type="textbox" id="code_'+roomSeq+'" style="width:10%"><button onclick="removeRoom(\''+roomSeq+'\')">-</button></p>');
+		$("#rooms").append(n);
+		roomsKey[roomsKey.length] = roomSeq;
+	}
+	
+	function removeRoom(id){
+		document.getElementById("_"+id).remove();
+	}
 
 	function updateandrestart(){
 		socket.emit("updateandrestart");
@@ -59,12 +91,19 @@
 	function resetLiving(){
 		var  messages = document.getElementById("messages");
 		messages.value = "";
-		socket.emit("resetlive",{
-					tid:document.getElementById("tid").value,
-					rid:document.getElementById("rid").value,
-					url:document.getElementById("url").value, 
-					code:document.getElementById("code").value,
-					type:document.getElementById("type").options[document.getElementById("type").selectedIndex].value});
+		var data = {tid: Id("tid").value, items:[]};
+		for(var i in roomsKey){
+			var p = document.getElementById("_"+roomsKey[i]);
+			if(p){
+				data.items[data.items.length] = {
+					rid: Id("rid_"+roomsKey[i]).value,
+					url: Id("url_"+roomsKey[i]).value,
+					code: Id("code_"+roomsKey[i]).value,
+					type: Id("type_"+roomsKey[i]).options[Id("type_"+roomsKey[i]).selectedIndex].value
+				};
+			}
+		}
+		socket.emit("resetlive", data);
 	}
 </script>
 </body>

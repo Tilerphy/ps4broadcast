@@ -11,6 +11,7 @@ var init = function (rid, io, lp){
         sock.on("data", (d)=>{
                 popBilibiliMsg(d, (msg)=>{
 			console.log("Here:"+ this.lp.currentTwitchClient);
+			msg.info[2][1] = "[B]"+msg.info[2][1];
                 	switch(msg.cmd){
 				case "DANMU_MSG":
 					if(this.lp.currentTwitchClient){
