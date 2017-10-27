@@ -137,6 +137,11 @@ Primary DNS: 114.114.114.114
 
 
 ---
-# 祝君好运，如有问题请发Gihub ISSUE
+# 特别鸣谢
+
+### PSNID： jwq-1416 感谢其对Bilibili弹幕功能测试做出的杰出贡献。
+
+---
+
 # 欢迎发pull request
 # 跪求大神移植到openwrt
