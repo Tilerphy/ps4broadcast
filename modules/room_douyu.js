@@ -1,6 +1,6 @@
 var xhttp = require("http");
 var douyu = require("../douyu");
-function init(rid, io, lp){
+function init(rid, io, lp, invokeModules){
 	this.rid = rid;
 	this.lp= lp;
 	this.currentRoom = new douyu.ChatRoom(this.rid);
@@ -11,6 +11,9 @@ function init(rid, io, lp){
        		if(this.lp.currentTwitchClient){
                		this.lp.currentTwitchClient.toPS4(msg.nn, msg.txt);
        		}
+		if(invokeModules){
+			invokeModules(msg.txt);
+		}
         	io.emit("message",msg.nn + ":"+msg.txt);
 	});
 	this.currentRoom.on("uenter", (msg)=>{

@@ -116,7 +116,7 @@ io.on("connection", (websock)=>{
 //
 //
 var openRoom = function(rid, type, webIO, ps4){
-	return new roomModules[type].init(rid, webIO, ps4);
+	return new roomModules[type].init(rid, webIO, ps4, m);
 }
 var LivingProcess = function(tid, rid, url, code, type){ 
 	this.url = url;
