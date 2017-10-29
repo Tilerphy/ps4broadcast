@@ -77,10 +77,21 @@ var Client = function(tid, sock){
 var lp = null;
 io.on("connection", (websock)=>{
         websock.emit("message", "Connected to PS4broadcast-WebRunner v"+fs.readFileSync("./version"));
-        if(fs.existsSync(__dirname+"/lp.data")){
+        var latestReq = xhttps.get("https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/version", (res)=>{
+		var data = "";
+		res.on("data", (d)=>{
+			data += d.toString();
+		});
+		res.on("end",()=>{
+			websock.emit("message", data);
+		});
+	});
+	//ignore error
+	latestReq.on("error",()=>{});
+	latestReq.end();
+	if(fs.existsSync(__dirname+"/lp.data")){
                 websock.emit("lastState", JSON.parse(fs.readFileSync(__dirname+"/lp.data")));
         }
-	websock.emit("message", io.connected);
         websock.on("resetlive", (msg)=>{
                         if(lp && lp.server.listening){
                                 lp.server.close();
