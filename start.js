@@ -80,6 +80,7 @@ io.on("connection", (websock)=>{
         if(fs.existsSync(__dirname+"/lp.data")){
                 websock.emit("lastState", JSON.parse(fs.readFileSync(__dirname+"/lp.data")));
         }
+	websock.emit("message", io.connected);
         websock.on("resetlive", (msg)=>{
                         if(lp && lp.server.listening){
                                 lp.server.close();
