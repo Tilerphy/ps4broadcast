@@ -5,10 +5,10 @@ var init = function (rid, io, lp){
 	this.lp = lp;
 	this.interval = null; 
 	var sock = net.connect(788, "livecmt-2.bilibili.com");
-        sock.on("connect", ()=>{
+	sock.on("connect", ()=>{
         	console.log("connected");
         });
-        sock.on("data", (d)=>{
+	sock.on("data", (d)=>{
                 popBilibiliMsg(d, (msg)=>{
                 	switch(msg.cmd){
 				case "DANMU_MSG":
@@ -53,18 +53,25 @@ var init = function (rid, io, lp){
 
 	Promise.all([p]);
 }
-
-
+var buf = null;
 function popBilibiliMsg(d, callback){
+	if(buf){
+		d = Buffer.concat([buf , d]);
+	}
        	if(callback && d[11]!= 3 && d[11]!= 8){
        		var length = d[0]*256*256*256+d[1]*256*256+d[2]*256+d[3];
-                //resolve bilibili TCP-nagle bug
+                console.log(d.length+"#"+length);
+		//resolve bilibili TCP-nagle bug
                 if(d.length == length){
+			buf = null;
                 	callback(JSON.parse(d.slice(16).toString()));
-                }else{
+                }else if (d.length > length){
+			buf = null;
                         callback(JSON.parse(d.slice(16,length).toString()));
                         popBilibiliMsg(d.slice(length), callback);
-                }
+                }else{
+			buf = d;
+		}
         }
 }
 module.exports.type= "bilibili";
