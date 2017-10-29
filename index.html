@@ -24,9 +24,10 @@
 	<input type="textbox" id="code" placeholder="Straem CODE">
 	</div> -->
 		<div class="status">
-			<button class="live"><div><i class="iconfont icon-iconfontplay2"></i></div></button>
-			<button type="button" onclick="resetLiving()" class="button"><div><i class="iconfont icon-reset"></i> Reset Living</div></button>
-			<button type="button" onclick="updateandrestart()" class="button1"><div><i class="iconfont icon-update"></i> Update + Restart</div></button>
+			<!--<button class="live"><div><i class="iconfont icon-iconfontplay2"></i></div></button>-->
+			<button id="resetButton" type="button" onclick="resetLiving()" class="button">
+				<div><i class="iconfont icon-reset"></i> <label>Reset Living</label></div></button>
+			<button id="updateButton" type="button" onclick="updateandrestart()" class="button1"><div><i class="iconfont icon-update"></i> Update + Restart</div></button>
 			<!-- <input type="button" value="Reset Living" onclick="resetLiving()"> -->
 			<!-- <input type="button" value="Update & Restart" onclick="updateandrestart()"></p> -->
 		</div>
@@ -61,9 +62,9 @@
 				var messages = document.getElementById("messages");
 				messages.value = messages.value += "LIVING STATUS: " + status + "\n";
 				if (status) {
-					$('.live').addClass('liveOn');
+					$('#resetButton').addClass('liveOn');
 				} else {
-					$('.live').removeClass('liveOn');
+					$('#resetButton').removeClass('liveOn');
 				}
 			});
 

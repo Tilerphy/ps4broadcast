@@ -1,4 +1,4 @@
-var version = require("./version");
+//var version = require("./version");
 var fs =require("fs");
 var express= require("express");
 var app = express();
@@ -76,7 +76,7 @@ var Client = function(tid, sock){
 
 var lp = null;
 io.on("connection", (websock)=>{
-        websock.emit("message", "Connected to PS4broadcast-WebRunner v"+version);
+        websock.emit("message", "Connected to PS4broadcast-WebRunner v"+fs.readFileSync("./version"));
         if(fs.existsSync(__dirname+"/lp.data")){
                 websock.emit("lastState", JSON.parse(fs.readFileSync(__dirname+"/lp.data")));
         }
