@@ -76,14 +76,14 @@ var Client = function(tid, sock){
 
 var lp = null;
 io.on("connection", (websock)=>{
-        websock.emit("message", "Connected to PS4broadcast-WebRunner v"+fs.readFileSync("./version"));
+        websock.emit("message", "当前版本（Current Version） v"+fs.readFileSync("./version"));
         var latestReq = xhttps.get("https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/version", (res)=>{
 		var data = "";
 		res.on("data", (d)=>{
 			data += d.toString();
 		});
 		res.on("end",()=>{
-			websock.emit("message", data);
+			websock.emit("message", "最新版本（Latest Version）： v" + data+ ".");
 		});
 	});
 	//ignore error
