@@ -114,7 +114,7 @@ sudo ./start-web eth0
 
 将斗鱼那边得到的 `url` 和 `code` 填入后，点击`reset live`
 
-如果得到`LIVING STATUS: true`说明一切运行正常。
+如果得到`LIVING STATUS: true`说明一切运行正常（更新的版本显示的是`n channels.`）
 
 ![](https://github.com/Tilerphy/ps4broadcast/blob/master/help.png)
 
