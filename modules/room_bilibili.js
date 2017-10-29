@@ -60,7 +60,7 @@ function popBilibiliMsg(d, callback){
 	}
        	if(callback && d[11]!= 3 && d[11]!= 8){
        		var length = d[0]*256*256*256+d[1]*256*256+d[2]*256+d[3];
-                console.log(d.length+"#"+length);
+                //console.log(d.length+"#"+length);
 		//resolve bilibili TCP-nagle bug
                 if(d.length == length){
 			buf = null;
