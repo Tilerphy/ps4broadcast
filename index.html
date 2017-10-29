@@ -1,111 +1,274 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>PS4Broadcast Control Panel</title>
-  </head>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<link rel="stylesheet" type="text/css" href="./iconfont.css">
+	<title>PS4Broadcast Control Panel</title>
+</head>
+
 <body>
-<p>Twitch Id:</p>
-<input type="textbox" id="tid" style="width:30%">
-<div id="rooms"></div>
-<p><button onclick="addMore()">+</button></p>
-<!--<p>Room Type:</p>
-<select id="type" style="width:30%">
-<option value="douyu">斗鱼</option>
-<option value="bilibili">Bilibili</option>
-<select>
-<p>Room Id:</p>
-<input type="textbox" id="rid" style="width:30%">
-<p>URL:</p>
-<input type="textbox" id="url" style="width:30%">
-<p>CODE:</p>
-<input type="textbox" id="code" style="width:30%">-->
-<p><input type="button" value="Reset Living" onclick="resetLiving()">
-<input type="button" value="Update & Restart" onclick="updateandrestart()"></p>
-<p>Messages:</p>
-<textarea id="messages" style="width:100%;height:400px">
-</textarea>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/jquery-3.2.1.min.js"></script>
-<script>
-	Element.prototype.remove = function() {
-    		this.parentElement.removeChild(this);
-	}
-	function Id(id){
-		return document.getElementById(id);
-	}
-	var socket = io();
-		socket.on("message", function(m){
-			var  messages = document.getElementById("messages");
-			if(messages.scrollHeight > 5000){
-				messages.value = "";
+	<div class="rooms">
+		<input type="textbox" id="tid" placeholder="Twitch Id">
+		<button class="button" onclick="addMore()"><div><i class="iconfont icon-add"></i></div></button>
+		<div id="rooms"></div>
+		<!-- </div>
+	<div class="rooms">
+	<select id="type">
+	<option> Room Type</option>
+	<option value="douyu">斗鱼</option>
+	<option value="bilibili">Bilibili</option>
+	<select>
+	<input type="textbox" id="rid" placeholder="Room ID">
+	<input type="textbox" id="url" placeholder="RMTP URL">
+	<input type="textbox" id="code" placeholder="Straem CODE">
+	</div> -->
+		<div class="status">
+			<button class="live"><div><i class="iconfont icon-iconfontplay2"></i></div></button>
+			<button type="button" onclick="resetLiving()" class="button"><div><i class="iconfont icon-reset"></i> Reset Living</div></button>
+			<button type="button" onclick="updateandrestart()" class="button1"><div><i class="iconfont icon-update"></i> Update + Restart</div></button>
+			<!-- <input type="button" value="Reset Living" onclick="resetLiving()"> -->
+			<!-- <input type="button" value="Update & Restart" onclick="updateandrestart()"></p> -->
+		</div>
+		<div class="mes">
+			<textarea id="messages" style="width:100%;height:400px">
+	</textarea>
+		</div>
+		<div class="footer">
+			<div class="buider">作者：<a href="">@TilerPhy</a></div>
+			<div class="maker">美化：<a href="">@SrvenX-07</a></div>
+		</div>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/js/jquery-3.2.1.min.js"></script>
+		<script>
+			Element.prototype.remove = function () {
+				this.parentElement.removeChild(this);
 			}
-			messages.value = messages.value += m +"\n";
-			messages.scrollTop = messages.scrollHeight;
-		});
-
-		socket.on("living", function(status){
-			var  messages = document.getElementById("messages");
-                        messages.value = messages.value += "LIVING STATUS: "+ status +"\n";
-		});
-			
-		socket.on("lastState", function(lp){
-			$("#rooms").html("");
-			if(lp && lp.items){
-				for(var l in lp.items){
-					addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type, lp.items[l].code);
+			function Id(id) {
+				return document.getElementById(id);
+			}
+			var socket = io();
+			socket.on("message", function (m) {
+				var messages = document.getElementById("messages");
+				if (messages.scrollHeight > 5000) {
+					messages.value = "";
 				}
-				$("#tid").val(lp.tid);
+				messages.value = messages.value += m + "\n";
+				messages.scrollTop = messages.scrollHeight;
+			});
+
+			socket.on("living", function (status) {
+				var messages = document.getElementById("messages");
+				messages.value = messages.value += "LIVING STATUS: " + status + "\n";
+				if (status) {
+					$('.live').addClass('liveOn');
+				} else {
+					$('.live').removeClass('liveOn');
+				}
+			});
+
+			socket.on("lastState", function (lp) {
+				$("#rooms").html("");
+				if (lp && lp.items) {
+					for (var l in lp.items) {
+						addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type, lp.items[l].code);
+					}
+					$("#tid").val(lp.tid);
+				}
+			});
+			socket.on("error", function (error) {
+				console.log(error);
+			});
+
+			var roomSeq = -1;
+			var roomsKey = [];
+			function addMore(rid, url, type, code) {
+				roomSeq++;
+				var n = $('<div class="rooms" id="_' + roomSeq + '"><select id="type_' + roomSeq + '">' +
+					'<option value="douyu" ' + (type == 'douyu' ? 'selected' : '') + '>斗鱼</option>' +
+					'<option value="bilibili" ' + (type == 'bilibili' ? 'selected' : '') + '>Bilibili</option>' +
+					'<select>' +
+					'<input type="textbox" id="rid_' + roomSeq + '" value="' + (rid ? rid : '') + '"  placeholder="Room ID">' +
+					'<input type="textbox" id="url_' + roomSeq + '" value="' + (url ? url : '') + '"  placeholder="RMTP URL">' +
+					'<input type="textbox" id="code_' + roomSeq + '" value="' + (code ? code : '') + '" placeholder="Straem CODE"><button class="button" onclick="removeRoom(\'' + roomSeq + '\')">Remove</button></div>');
+				$("#rooms").append(n);
+				roomsKey[roomsKey.length] = roomSeq;
 			}
-		});
-		socket.on("error", function(error){
-			console.log(error);
-		});
 
-	var roomSeq = -1;
-	var roomsKey = [];
-	function addMore(rid,url,type,code){
-		roomSeq ++;
-		var n = $('<p id="_'+roomSeq+'">Room Type:'+
-					'<select id="type_'+roomSeq+'" style="width:10%">'+
-					'<option value="douyu" '+ (type=='douyu'?'selected':'') +'>斗鱼</option>'+
-					'<option value="bilibili" '+ (type=='bilibili'?'selected':'') +'>Bilibili</option>'+
-					'<select>'+
-					'Room Id:'+
-					'<input type="textbox" id="rid_'+roomSeq+'" style="width:10%" value="'+(rid ? rid : '')+'">'+
-					'URL:'+
-					'<input type="textbox" id="url_'+roomSeq+'" style="width:10%" value="'+(url ? url: '')+'">'+
-					'CODE:'+
-					'<input type="textbox" id="code_'+roomSeq+'" style="width:10%" value="'+(code? code:'')+'"><button onclick="removeRoom(\''+roomSeq+'\')">-</button></p>');
-		$("#rooms").append(n);
-		roomsKey[roomsKey.length] = roomSeq;
-	}
-	
-	function removeRoom(id){
-		document.getElementById("_"+id).remove();
-	}
-
-	function updateandrestart(){
-		socket.emit("updateandrestart");
-	}
-
-	function resetLiving(){
-		var  messages = document.getElementById("messages");
-		messages.value = "";
-		var data = {tid: Id("tid").value, items:[]};
-		for(var i in roomsKey){
-			var p = document.getElementById("_"+roomsKey[i]);
-			if(p){
-				data.items[data.items.length] = {
-					rid: Id("rid_"+roomsKey[i]).value,
-					url: Id("url_"+roomsKey[i]).value,
-					code: Id("code_"+roomsKey[i]).value,
-					type: Id("type_"+roomsKey[i]).options[Id("type_"+roomsKey[i]).selectedIndex].value
-				};
+			function removeRoom(id) {
+				document.getElementById("_" + id).remove();
 			}
-		}
-		socket.emit("resetlive", data);
-	}
-</script>
+
+			function updateandrestart() {
+				socket.emit("updateandrestart");
+			}
+
+			function resetLiving() {
+				var messages = document.getElementById("messages");
+				messages.value = "";
+				var data = { tid: Id("tid").value, items: [] };
+				for (var i in roomsKey) {
+					var p = document.getElementById("_" + roomsKey[i]);
+					if (p) {
+						data.items[data.items.length] = {
+							rid: Id("rid_" + roomsKey[i]).value,
+							url: Id("url_" + roomsKey[i]).value,
+							code: Id("code_" + roomsKey[i]).value,
+							type: Id("type_" + roomsKey[i]).options[Id("type_" + roomsKey[i]).selectedIndex].value
+						};
+					}
+				}
+				socket.emit("resetlive", data);
+			}
+		</script>
+		<style>
+			@font-face {
+				font-family: "iconfont";
+				src: url('iconfont.eot?t=1509263567677');
+				/* IE9*/
+				src: url('iconfont.eot?t=1509263567677#iefix') format('embedded-opentype'), /* IE6-IE8 */
+				url('data:application/x-font-woff;charset=utf-8;base64,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') format('woff'),
+				url('iconfont.ttf?t=1509263567677') format('truetype'), /* chrome, firefox, opera, Safari, Android, iOS 4.2+*/
+				url('iconfont.svg?t=1509263567677#iconfont') format('svg');
+				/* iOS 4.1- */
+			}
+
+			.iconfont {
+				font-family: "iconfont" !important;
+				font-size: 16px;
+				font-style: normal;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+			}
+
+			.icon-add:before {
+				content: "\e6b9";
+			}
+
+			.icon-reset:before {
+				content: "\e604";
+			}
+
+			.icon-iconfontplay2:before {
+				content: "\e719";
+			}
+
+			.icon-update:before {
+				content: "\e968";
+			}
+
+			body,
+			p,
+			input,
+			div,
+			a,
+			h1,
+			select {
+				margin: 0;
+				padding: 0;
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				text-decoration: none;
+			}
+
+			body {
+				width: 60%;
+				margin: 10% auto 10% auto;
+			}
+
+			input {
+				border-radius: 3px;
+				height: 33px;
+				border: 1px solid #CCC;
+				margin: 0 10px 10px 0px;
+				float: left;
+				line-height: 25px;
+			}
+
+			button,
+			.button,
+			.button1,
+			select,
+			option,
+			.live {
+				height: 35px;
+				font-size: 1em;
+				transition: 0.2s;
+				color: #777;
+				float: left;
+				margin: 0px 10px 0 0;
+				padding: 5px;
+				border-radius: 5px;
+				text-align: center;
+				border: 1px solid #CCC;
+			}
+
+			.liveOn {
+				border-color: forestgreen;
+				background: white;
+				box-shadow: 0 0 4px forestgreen;
+				color: forestgreen;
+			}
+
+			.button:hover {
+				border-color: limegreen;
+				background-color: white;
+				box-shadow: 0 0 4px limegreen;
+				color: limegreen;
+			}
+
+			.button1:hover {
+				border-color: red;
+				background-color: white;
+				box-shadow: 0 0 4px red;
+				color: red;
+			}
+
+			.mes,
+			.rooms,
+			.status {
+				float: left;
+				margin: 0 0 10px 0;
+				width: 100%;
+			}
+
+			.rooms {
+				height: 40px;
+				margin-bottom: 8px;
+			}
+
+			#type {
+				height: 35px;
+				border-radius: 3px;
+				margin-left: 8px;
+			}
+
+			.mes textarea {
+				font-family: Arial, Helvetica, sans-serif;
+				color: #222;
+				border-radius: 5px;
+				border: 1px solid #CCC;
+			}
+
+			p {
+				font-family: Arial, Helvetica, sans-serif;
+				color: #666;
+			}
+
+			.footer {
+				border-radius: 5px;
+			}
+
+			.footer div {
+				font-size: 15px;
+				margin: 5px;
+				color: #AAA;
+				float: left;
+			}
+
+			.footer a {
+				color: #777;
+			}
+		</style>
 </body>
+
 </html>
