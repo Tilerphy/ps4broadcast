@@ -87,7 +87,9 @@ io.on("connection", (websock)=>{
 		});
 	});
 	//ignore error
-	latestReq.on("error",()=>{});
+	latestReq.on("error",()=>{
+		console.log("Cannot connect to github, please check the version manually.");
+	});
 	latestReq.end();
 	if(fs.existsSync(__dirname+"/lp.data")){
                 websock.emit("lastState", JSON.parse(fs.readFileSync(__dirname+"/lp.data")));
