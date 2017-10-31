@@ -83,7 +83,7 @@ io.on("connection", (websock)=>{
 			data += d.toString();
 		});
 		res.on("end",()=>{
-			websock.emit("message", "最新版本（Latest Version） v" + data+ ".");
+			websock.emit("message", "最新版本（Latest Version） v" + data);
 		});
 	});
 	//ignore error
