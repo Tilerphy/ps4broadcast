@@ -77,7 +77,7 @@ var Client = function(tid, sock){
 var lp = null;
 io.on("connection", (websock)=>{
         websock.emit("message", "当前版本（Current Version） v"+fs.readFileSync("./version"));
-        var latestReq = xhttps.get("https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/version", (res)=>{
+        var latestReq = xhttps.get("https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/version?r="+Math.random(), (res)=>{
 		var data = "";
 		res.on("data", (d)=>{
 			data += d.toString();
