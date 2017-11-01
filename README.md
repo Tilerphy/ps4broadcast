@@ -1,4 +1,4 @@
-![](https://gitter.im/ghost-studio/ps4broadcast?utm_source=share-link&utm_medium=link&utm_campaign=share-link)
+![](https://gitter.im/ghost-studio/ps4broadcast?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 # 前言
 鉴于PS4暂时没有直播到国内直播平台的功能，所以用了一些手段拦截twitch的RTMP内容与IRC聊天室内容，并且转发到斗鱼（将来可能会增加其他的国内直播平台。）
 另外，这只是个折中手段，没准过几天PS4官方支持国内的直播平台推流了，起码国行机器是有这个可能的，这个谁说的准呢？所以这个方案只是个临时的，没有办法的办法。
