@@ -129,6 +129,15 @@ io.on("connection", (websock)=>{
                         }
                 });
         });
+
+	websock.on("update", ()=>{
+		exec("git pull origin master", (error, stdout, stderr)=>{
+			if(error || stderr){
+                                console.log(error);
+                                console.log(stderr);
+                        }
+		});
+	});
 });
 //start Web Server Defines
 //
