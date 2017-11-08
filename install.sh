@@ -1,3 +1,4 @@
+#!/bin/sh
 echo "install the required software......"
 apt-get update
 apt-get install -y git libpcre3-dev nodejs openssl libssl-dev gcc g++ automake zlib1g-dev make psmisc
