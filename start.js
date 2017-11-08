@@ -77,13 +77,13 @@ var Client = function(tid, sock){
 var lp = null;
 io.on("connection", (websock)=>{
         websock.emit("message", "当前版本（Current Version） v"+fs.readFileSync("./version"));
-        var latestReq = xhttps.get("https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/version", (res)=>{
+        var latestReq = xhttps.get("https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/version?r="+Math.random(), (res)=>{
 		var data = "";
 		res.on("data", (d)=>{
 			data += d.toString();
 		});
 		res.on("end",()=>{
-			websock.emit("message", "最新版本（Latest Version） v" + data+ ".");
+			websock.emit("message", "最新版本（Latest Version） v" + data);
 		});
 	});
 	//ignore error
@@ -129,6 +129,15 @@ io.on("connection", (websock)=>{
                         }
                 });
         });
+
+	websock.on("update", ()=>{
+		exec("git pull origin master", (error, stdout, stderr)=>{
+			if(error || stderr){
+                                console.log(error);
+                                console.log(stderr);
+                        }
+		});
+	});
 });
 //start Web Server Defines
 //

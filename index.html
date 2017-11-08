@@ -26,8 +26,9 @@
 		<div class="status">
 			<!--<button class="live"><div><i class="iconfont icon-iconfontplay2"></i></div></button>-->
 			<button id="resetButton" type="button" onclick="resetLiving()" class="button">
-				<div><i class="iconfont icon-reset"></i> <label>Reset Living</label></div></button>
+			<div><i class="iconfont icon-reset"></i> <label>Reset Living</label></div></button>
 			<button id="updateButton" type="button" onclick="updateandrestart()" class="button1"><div><i class="iconfont icon-update"></i> Update + Restart</div></button>
+			<button type="button" onclick="update()" class="button1"><div><i class="iconfont icon-update"></i> Update</div></button>
 			<!-- <input type="button" value="Reset Living" onclick="resetLiving()"> -->
 			<!-- <input type="button" value="Update & Restart" onclick="updateandrestart()"></p> -->
 		</div>
@@ -102,7 +103,10 @@
 			function updateandrestart() {
 				socket.emit("updateandrestart");
 			}
-
+			
+			function update(){
+				socket.emit("update");
+			}
 			function resetLiving() {
 				var messages = document.getElementById("messages");
 				messages.value = "";
@@ -231,7 +235,7 @@
 			.status {
 				float: left;
 				margin: 0 0 10px 0;
-				width: 100%;
+				width: 660px;
 			}
 
 			.rooms {
