@@ -258,6 +258,10 @@ app.get("/",(req,res)=>{
         res.sendFile(__dirname+"/index.html");
 });
 
+app.get("/theme/:type", (req,res)=>{
+	res.sendFile(__dirname+"/index."+req.params.type+".html");
+})
+
 app.get("/t/:psnid",(req,res)=>{
         var psnid = req.params.psnid;
         var opt ={

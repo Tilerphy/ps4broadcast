@@ -3,7 +3,7 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-	<link rel="stylesheet" type="text/css" href="./iconfont.css">
+	<!--<link rel="stylesheet" type="text/css" href="./iconfont.css">-->
 	<title>PS4Broadcast Control Panel</title>
 </head>
 
@@ -12,25 +12,13 @@
 		<input type="textbox" id="tid" placeholder="Twitch Id">
 		<button class="button" onclick="addMore()"><div><i class="iconfont icon-add"></i></div></button>
 		<div id="rooms"></div>
-		<!-- </div>
-	<div class="rooms">
-	<select id="type">
-	<option> Room Type</option>
-	<option value="douyu">斗鱼</option>
-	<option value="bilibili">Bilibili</option>
-	<select>
-	<input type="textbox" id="rid" placeholder="Room ID">
-	<input type="textbox" id="url" placeholder="RMTP URL">
-	<input type="textbox" id="code" placeholder="Straem CODE">
-	</div> -->
 		<div class="status">
 			<!--<button class="live"><div><i class="iconfont icon-iconfontplay2"></i></div></button>-->
 			<button id="resetButton" type="button" onclick="resetLiving()" class="button">
 			<div><i class="iconfont icon-reset"></i> <label>Reset Living</label></div></button>
 			<button id="updateButton" type="button" onclick="updateandrestart()" class="button1"><div><i class="iconfont icon-update"></i> Update + Restart</div></button>
 			<button type="button" onclick="update()" class="button1"><div><i class="iconfont icon-update"></i> Update</div></button>
-			<!-- <input type="button" value="Reset Living" onclick="resetLiving()"> -->
-			<!-- <input type="button" value="Update & Restart" onclick="updateandrestart()"></p> -->
+			<button onclick="window.location.href='/theme/classic'">Classic Theme</button>
 		</div>
 		<div class="mes">
 			<textarea id="messages" style="width:100%;height:400px"></textarea>
@@ -279,3 +267,4 @@
 </body>
 
 </html>
+
