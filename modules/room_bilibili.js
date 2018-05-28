@@ -4,11 +4,12 @@ var init = function (rid, io, lp){
 	this.rid = rid;
 	this.lp = lp;
 	this.interval = null; 
-	var sock = net.connect(788, "livecmt-2.bilibili.com");
+	var sock = net.connect(788, "livecmt-1.bilibili.com");
 	sock.on("connect", ()=>{
         	console.log("connected");
         });
 	sock.on("data", (d)=>{
+		console.log(d.toString());
                 popBilibiliMsg(d, (msg)=>{
                 	switch(msg.cmd){
 				case "DANMU_MSG":

@@ -6,7 +6,7 @@ var Message = require('./message');
 
 var host = 'openbarrage.douyutv.com';
 var port = 8601;
-
+var retryIntervalTime = 5000;
 function Client() {
 	events.EventEmitter.call(this);
 	this.init();
@@ -14,7 +14,7 @@ function Client() {
 util.inherits(Client, events.EventEmitter);
 
 Client.prototype.init = function(){
-	this.s = null;
+	this.reconnecting =false;
 	this.rawBuffer = '';
 	this.messageBuffer = '';
 };
@@ -24,22 +24,32 @@ Client.prototype.close = function(){
 }
 
 Client.prototype.connect = function(){
+	if(this.reconnecting){
+		this.emit("reconnecting");
+	}
 	this.s = new net.Socket();
+	this.s.on("error",this.onError.bind(this));
 	this.s.setEncoding('hex');
-	this.s.connect(port, host, this.onConnected.bind(this));
+        this.s.connect(port, host,this.onConnected.bind(this));
 };
 
-Client.prototype.onConnected = function(){
-	// console.log('[Client] Socket connected');
+Client.prototype.onConnected = function(e){
 	this.s.on('data', this.onData.bind(this));
-	this.s.on('error', this.onError.bind(this));
 	this.s.on('close', this.onClosed.bind(this));
+	this.reconnecting =false;
 	this.emit('connect');
 };
 
+
 Client.prototype.onError = function(err){
 	this.emit('error', err);
+	setTimeout(this.reconnect.bind(this), retryIntervalTime);
 }
+
+Client.prototype.reconnect = function(){
+	this.reconnecting = true;
+	this.connect();
+};
 
 Client.prototype.onClosed = function(had_error){
 	this.emit('close', had_error);

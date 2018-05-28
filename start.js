@@ -44,6 +44,10 @@ function m(arg){
                 }
         });
 }
+
+process.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
 //
 //
 //
@@ -219,7 +223,8 @@ var LivingProcess = function(tid, items){
         this.config =()=>{
                 return  new Promise((resolve,reject)=>{
                         try{
-                                var fileContent = "server { listen 1935; chunk_size 10240; max_message 64M; \n application app { live on; record off; meta copy; \n";
+                                var fileContent = "server { listen 1935; chunk_size 10240; max_message 64M; \n"+
+							" application app { live on; record off; meta copy; \n";
                                 for(var item of this.items){
                                         fileContent += "push "+
                                                         item.url

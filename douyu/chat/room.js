@@ -15,7 +15,13 @@ Room.prototype.open = function(){
 	this.client = new Client();
 	this.client.on('connect', this.onConnected.bind(this));
 	this.client.on('message', this.onMessage.bind(this));
+        this.client.on("error",this.onError.bind(this));
+	this.client.on("reconnecting", this.onReconnecting.bind(this));
 	this.client.connect();
+}
+
+Room.prototype.onReconnecting = function(){
+	this.emit("reconnecting");
 }
 
 Room.prototype.close = function(){

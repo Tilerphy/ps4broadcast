@@ -1,12 +1,19 @@
+
 var xhttp = require("http");
 var douyu = require("../douyu");
 function init(rid, io, lp, invokeModules){
 	this.rid = rid;
 	this.lp= lp;
 	this.currentRoom = new douyu.ChatRoom(this.rid);
-	this.close = ()=>{
+        this.close = ()=>{
 		this.currentRoom.close();
 	}
+	this.currentRoom.on("reconnecting",()=>{
+		io.emit("message", "[D]弹幕重连中");
+	});
+        this.currentRoom.on("error",()=>{ 
+		io.emit("message","[D]弹幕连接失败");
+	});
 	this.currentRoom.on("chatmsg", (msg)=>{
        		if(this.lp.currentTwitchClient){
                		this.lp.currentTwitchClient.toPS4(msg.nn, msg.txt);
