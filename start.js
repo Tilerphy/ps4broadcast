@@ -154,7 +154,7 @@ var LivingProcess = function(tid, items){
         this.rooms = [];
         this.currentTwitchClient = null;
         this.server = null;
-	this.recordPath = "/tmp";
+	this.recordPath = "";
         this.items = items;
         this.setup= (tid,recordPath, items)=>{
                 return new Promise((resolve,reject)=>{
@@ -227,8 +227,10 @@ var LivingProcess = function(tid, items){
                         try{
                                 var fileContent = "server { listen 1935; chunk_size 10240; max_message 64M; \n"+
 							" application app { live on;  meta copy; \n";
-				fileContent += "record all;record_path "+this.recordPath+"; record_suffix _rec.flv; record_unique on; record_interval 60m; \n";
-                                for(var item of this.items){
+				if(this.recordPath!=null && this.recordPath.trim()!=""){
+					fileContent += "record all;record_path "+this.recordPath+"; record_suffix _rec.flv; record_unique on; record_interval 60m; \n";
+                                }
+				for(var item of this.items){
                                         fileContent += "push "+
                                                         item.url
                                                         + (item.url.endsWith("/") ? "" : "/")+
