@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<link rel="stylesheet" href="/js/bootstrap.min.css">
+	<title>PS4Broadcast Control Panel</title>
+</head>
+
+<body>
+	<div>
+		<input type="textbox" id="tid" placeholder="Twitch Id">
+		<button onclick="addMore()">Add Channel</button>
+		<div id="rooms"></div>
+		<div>
+			<button id="resetButton" type="button" onclick="resetLiving()"><div>Reset Living</div></button>
+			<button id="updateButton" type="button" onclick="updateandrestart()"><div>Update + Restart</div></button>
+			<button type="button" onclick="update()"><div> Update</div></button>
+		</div>
+		<div>
+			<textarea id="messages" style="width:100%;height:400px"></textarea>
+		</div>
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="/js/jquery-3.2.1.min.js"></script>
+		<script src="/js/bootstrap.min.js"></script>
+		<script>
+			Element.prototype.remove = function () {
+				this.parentElement.removeChild(this);
+			}
+			function Id(id) {
+				return document.getElementById(id);
+			}
+			var socket = io();
+			socket.on("message", function (m) {
+				var messages = document.getElementById("messages");
+				if (messages.scrollHeight > 5000) {
+					messages.value = "";
+				}
+				messages.value = messages.value += m + "\n";
+				messages.scrollTop = messages.scrollHeight;
+			});
+
+			socket.on("living", function (status) {
+				var messages = document.getElementById("messages");
+				messages.value = messages.value += "LIVING STATUS: " + status + "\n";
+			});
+
+			socket.on("lastState", function (lp) {
+				$("#rooms").html("");
+				if (lp && lp.items) {
+					for (var l in lp.items) {
+						addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type, lp.items[l].code);
+					}
+					$("#tid").val(lp.tid);
+				}
+			});
+			socket.on("error", function (error) {
+				console.log(error);
+			});
+
+			var roomSeq = -1;
+			var roomsKey = [];
+			function addMore(rid, url, type, code) {
+				roomSeq++;
+				var n = $('<div id="_' + roomSeq + '"><select id="type_' + roomSeq + '">' +
+					'<option value="douyu" ' + (type == 'douyu' ? 'selected' : '') + '>斗鱼</option>' +
+					'<option value="bilibili" ' + (type == 'bilibili' ? 'selected' : '') + '>Bilibili</option>' +
+					'<select>' +
+					'<input type="textbox" id="rid_' + roomSeq + '" value="' + (rid ? rid : '') + '"  placeholder="Room ID">' +
+					'<input type="textbox" id="url_' + roomSeq + '" value="' + (url ? url : '') + '"  placeholder="RMTP URL">' +
+					'<input type="textbox" id="code_' + roomSeq + '" value="' + (code ? code : '') + '" placeholder="Stream CODE"><button onclick="removeRoom(\'' + roomSeq + '\')">Remove</button></div>');
+				$("#rooms").append(n);
+				roomsKey[roomsKey.length] = roomSeq;
+			}
+
+			function removeRoom(id) {
+				document.getElementById("_" + id).remove();
+			}
+
+			function updateandrestart() {
+				socket.emit("updateandrestart");
+			}
+			
+			function update(){
+				socket.emit("update");
+			}
+			function resetLiving() {
+				var messages = document.getElementById("messages");
+				messages.value = "";
+				var data = { tid: Id("tid").value, items: [] };
+				for (var i in roomsKey) {
+					var p = document.getElementById("_" + roomsKey[i]);
+					if (p) {
+						data.items[data.items.length] = {
+							rid: Id("rid_" + roomsKey[i]).value,
+							url: Id("url_" + roomsKey[i]).value,
+							code: Id("code_" + roomsKey[i]).value,
+							type: Id("type_" + roomsKey[i]).options[Id("type_" + roomsKey[i]).selectedIndex].value
+						};
+					}
+				}
+				socket.emit("resetlive", data);
+			}
+		</script>
+</body>
+
+</html>
