@@ -11,6 +11,7 @@
 	<div class="rooms">
 		<input type="textbox" id="tid" placeholder="Twitch Id">
 		<button class="button" onclick="addMore()"><div><i class="iconfont icon-add"></i></div></button>
+		<div style="display:block"><input type="text" id="recordPath" placeholder="Record Path"></div>
 		<div id="rooms"></div>
 		<div class="status">
 			<!--<button class="live"><div><i class="iconfont icon-iconfontplay2"></i></div></button>-->
@@ -63,6 +64,7 @@
 						addMore(lp.items[l].rid, lp.items[l].url, lp.items[l].type, lp.items[l].code);
 					}
 					$("#tid").val(lp.tid);
+					$("#recordPath").val(lp.recordPath);
 				}
 			});
 			socket.on("error", function (error) {
@@ -98,7 +100,7 @@
 			function resetLiving() {
 				var messages = document.getElementById("messages");
 				messages.value = "";
-				var data = { tid: Id("tid").value, items: [] };
+				var data = { tid: Id("tid").value,recordPath:Id("recordPath").value, items: [] };
 				for (var i in roomsKey) {
 					var p = document.getElementById("_" + roomsKey[i]);
 					if (p) {

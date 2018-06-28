@@ -43,7 +43,7 @@ Client.prototype.onConnected = function(e){
 
 Client.prototype.onError = function(err){
 	this.emit('error', err);
-	setTimeout(this.reconnect.bind(this), retryIntervalTime);
+//	setTimeout(this.reconnect.bind(this), retryIntervalTime);
 }
 
 Client.prototype.reconnect = function(){

@@ -111,7 +111,7 @@ io.on("connection", (websock)=>{
                                 }
                         }
                         lp = new LivingProcess();
-                        lp.setup(msg.tid, msg.items)
+                        lp.setup(msg.tid,msg.recordPath, msg.items)
                           .then(lp.prepare())
                           .then(lp.config())
                           .then(lp.resetTwitchClient())
@@ -154,13 +154,15 @@ var LivingProcess = function(tid, items){
         this.rooms = [];
         this.currentTwitchClient = null;
         this.server = null;
+	this.recordPath = "/tmp";
         this.items = items;
-        this.setup= (tid, items)=>{
+        this.setup= (tid,recordPath, items)=>{
                 return new Promise((resolve,reject)=>{
                         this.tid=tid;
+			this.recordPath = recordPath;
                         console.log(items);
                         this.items = items;
-                        fs.writeFileSync(__dirname+"/lp.data", JSON.stringify({tid:tid, items:items}));
+                        fs.writeFileSync(__dirname+"/lp.data", JSON.stringify({tid:tid,recordPath:recordPath, items:items}));
                         resolve();
                 });
         };
@@ -224,7 +226,8 @@ var LivingProcess = function(tid, items){
                 return  new Promise((resolve,reject)=>{
                         try{
                                 var fileContent = "server { listen 1935; chunk_size 10240; max_message 64M; \n"+
-							" application app { live on; record off; meta copy; \n";
+							" application app { live on;  meta copy; \n";
+				fileContent += "record all;record_path "+this.recordPath+"; record_suffix _rec.flv; record_unique on; record_interval 60m; \n";
                                 for(var item of this.items){
                                         fileContent += "push "+
                                                         item.url
