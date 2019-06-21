@@ -19,6 +19,9 @@
 
 # 需要会什么
 一些Linux的基础知识，一些shell脚本以及目录知识。
+
+如果不会这些，请直接使用镜像教程： https://www.psnine.com/topic/32642
+
 # 准备工作
 
 Debian 8 或者 Raspbian（树莓派操作系统，debian的ARM编译）的电脑或者树莓派或者虚拟机，这台电脑的ip假设是`192.168.0.8`
