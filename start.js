@@ -195,7 +195,7 @@ var LivingProcess = function(tid, items){
                                 this.currentTwitchClient = new Client(this.tid, sock);
                                 sock.on("data", (d)=>{
                                         var message = d.toString();
-                                        console.log("PS4 said: "+message);
+                                        console.log("Console said: "+message);
                                         if(message.indexOf("NICK") == 0 || message.indexOf(" PASS")==0){
                                                 this.currentTwitchClient.sendHandshake();
                                         }
