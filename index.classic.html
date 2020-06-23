@@ -65,6 +65,8 @@
 				var n = $('<div id="_' + roomSeq + '"><select id="type_' + roomSeq + '">' +
 					'<option value="douyu" ' + (type == 'douyu' ? 'selected' : '') + '>斗鱼</option>' +
 					'<option value="bilibili" ' + (type == 'bilibili' ? 'selected' : '') + '>Bilibili</option>' +
+					'<option value="private" ' + (type == 'private' ? 'selected' : '') + '>Private</option>' +
+
 					'<select>' +
 					'<input type="textbox" id="rid_' + roomSeq + '" value="' + (rid ? rid : '') + '"  placeholder="Room ID">' +
 					'<input type="textbox" id="url_' + roomSeq + '" value="' + (url ? url : '') + '"  placeholder="RMTP URL">' +

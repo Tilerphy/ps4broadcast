@@ -10,7 +10,7 @@ var exec = require("child_process").exec;
 var net = require("net");
 var douyu = require("./douyu");
 // 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
-var host = "192.168.200.1";
+var host = "0.0.0.0";
 var port = 6667;
 // 额外模块加载与使用
 var modules = [];
@@ -72,8 +72,9 @@ var Client = function(tid, sock){
                         this.sock.write(":tmi.twitch.tv 372 "+this.tid+" :You are in a maze of twisty passages, all alike.\r\n");
                         this.sock.write(":tmi.twitch.tv 376 "+this.tid+" :>\r\n");
                         this.sock.write("\r\n");
+			console.log("handshake sent to ps4");
                 }catch(e){
-
+			console.log("handshake sent faild.");
                 }
         };
 }
@@ -111,6 +112,7 @@ io.on("connection", (websock)=>{
                                 }
                         }
                         lp = new LivingProcess();
+			lp.webapp = app;
                         lp.setup(msg.tid,msg.recordPath, msg.items)
                           .then(lp.prepare())
                           .then(lp.config())
@@ -147,7 +149,7 @@ io.on("connection", (websock)=>{
 //
 //
 var openRoom = function(rid, type, webIO, ps4){
-        return new roomModules[type].init(rid, webIO, ps4);
+        return new roomModules[type].init(rid, webIO, ps4,app);
 }
 var LivingProcess = function(tid, items){
         this.tid = tid;
@@ -193,8 +195,8 @@ var LivingProcess = function(tid, items){
                                 this.currentTwitchClient = new Client(this.tid, sock);
                                 sock.on("data", (d)=>{
                                         var message = d.toString();
-                                        console.log(message);
-                                        if(message.indexOf("NICK") == 0){
+                                        console.log("PS4 said: "+message);
+                                        if(message.indexOf("NICK") == 0 || message.indexOf(" PASS")==0){
                                                 this.currentTwitchClient.sendHandshake();
                                         }
                                 });

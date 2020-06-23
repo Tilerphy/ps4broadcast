@@ -1,16 +1,16 @@
 var net = require("net");
+const { deflate, unzip,inflate } = require('zlib');
 var init = function (rid, io, lp){
 	this.uid = 123456789012345 + parseInt(1000000000000000*Math.random());
 	this.rid = rid;
 	this.lp = lp;
 	this.interval = null; 
-	var sock = net.connect(788, "livecmt-1.bilibili.com");
+	var sock = net.connect(2243, "chat.bilibili.com");
 	sock.on("connect", ()=>{
         	console.log("connected");
         });
 	sock.on("data", (d)=>{
-		console.log(d.toString());
-                popBilibiliMsg(d, (msg)=>{
+		popBilibiliMsg(d, (msg)=>{
                 	switch(msg.cmd){
 				case "DANMU_MSG":
 					if(this.lp.currentTwitchClient){
@@ -59,21 +59,39 @@ function popBilibiliMsg(d, callback){
 	if(buf){
 		d = Buffer.concat([buf , d]);
 	}
+	var version = d[6]<<8 | d[7];
+	var action = d[8]|d[9]|d[10]|d[11];
        	if(callback && d[11]!= 3 && d[11]!= 8){
        		var length = d[0]*256*256*256+d[1]*256*256+d[2]*256+d[3];
-                //console.log(d.length+"#"+length);
 		//resolve bilibili TCP-nagle bug
-                if(d.length == length){
-			buf = null;
-                	callback(JSON.parse(d.slice(16).toString()));
-                }else if (d.length > length){
-			buf = null;
-                        callback(JSON.parse(d.slice(16,length).toString()));
-                        popBilibiliMsg(d.slice(length), callback);
-                }else{
-			buf = d;
+		console.log(version);
+		console.log("action"+action);
+		if(version != 2){
+			if(d.length == length){
+                        	buf = null;
+                        	callback(JSON.parse(d.slice(16).toString()));
+                	}else if (d.length > length){
+                        	buf = null;
+                        	callback(JSON.parse(d.slice(16,length).toString()));
+                        	popBilibiliMsg(d.slice(length), callback);
+                	}else{
+                        	buf = d;
+                	}
+		}else{
+			if(action==5){
+				var newLength = d[0]|d[1]|d[2]|d[3];
+                		inflate(d.slice(16), (er4, newD)=>{
+					if(er4){
+						console.log(er4);
+					}else{
+						console.log(newD.toString().slice(16));
+                        			callback(JSON.parse(newD.toString().slice(16)));
+					}
+				});
+			}
 		}
         }
 }
 module.exports.type= "bilibili";
 module.exports.init = init;
+
