@@ -9,6 +9,7 @@ function init(rid, io, lp, app){
 	};
 	this.currentRoom = new douyu(this.rid, this.opt);
         this.close = ()=>{
+		this.currentRoom.logout();
 	}
         this.currentRoom.on("error",()=>{ 
 		io.emit("message","[D]弹幕连接失败");
