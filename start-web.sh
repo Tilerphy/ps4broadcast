@@ -1,6 +1,8 @@
 #!/bin/sh
 basepath=$(cd `dirname $0`; pwd)
 cd $basepath
+mkdir node_modules
+cp -R ./douyu/* node_modules
 iptables -t nat -F
 #ip route add local default dev lo table 100
 #ip rule add fwmark 1 lookup 100

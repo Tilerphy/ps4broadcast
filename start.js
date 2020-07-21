@@ -8,7 +8,6 @@ var xhttps =require("https");
 var io= require("socket.io")(http);
 var exec = require("child_process").exec;
 var net = require("net");
-var douyu = require("./douyu");
 // 这个和install.sh中用的linux电脑虚拟ip一致，或者写成0.0.0.0
 var host = "0.0.0.0";
 var port = 6667;

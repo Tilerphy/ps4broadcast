@@ -1,16 +1,16 @@
 
 var xhttp = require("http");
-var douyu = require("../douyu");
+var douyu = require("douyudm");
 function init(rid, io, lp, app){
 	this.rid = rid;
 	this.lp= lp;
-	this.currentRoom = new douyu.ChatRoom(this.rid);
+	this.opt= {
+		debug:false
+	};
+	this.currentRoom = new douyu(this.rid, this.opt);
         this.close = ()=>{
 		this.currentRoom.close();
 	}
-	this.currentRoom.on("reconnecting",()=>{
-		io.emit("message", "[D]弹幕重连中");
-	});
         this.currentRoom.on("error",()=>{ 
 		io.emit("message","[D]弹幕连接失败");
 	});
@@ -53,7 +53,7 @@ function init(rid, io, lp, app){
 		douyuReq.end();
 	});
 	try{
-		this.currentRoom.open();
+		this.currentRoom.run();
 	}catch(e){
 		io.emit("error", e.toString());
 	}
