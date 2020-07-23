@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演示页面</title>
+    <script src="https://flxxyz.github.io/douyudm/dist/douyudanmaku.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .messageList {
+            text-decoration: none;
+            margin: 0;
+            padding: 0;
+            overflow-y: scroll;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='app'>
+        <div>
+            <input type='number' placeholder='请输入房间号' v-model='roomId'>
+            <button @click='enter'>确定</button>
+            <button @click='close' :disabled='isClosed'>关闭</button>
+            <button @click='clear' :disabled='isClosed'>清屏</button>
+            <button @click='loggerExport' :disabled='!isDebug'>导出日志</button>
+            <button @click='loggerClear' :disabled='!isDebug'>清除日志</button>
+            <input type="checkbox" v-model='debug'><label for="checkbox">调试模式</label>
+            <span>{{ tips }}</span>
+        </div>
+        <hr>
+        <ul class='messageList' :style='{height: messageListHeight}'>
+            <message v-for='message in messageList' :key='message.id' :message='message' />
+        </ul>
+    </div>
+
+    <script>
+        Vue.component('message', {
+            template: '<li :id="className">{{ message.content }}</li>',
+            props: ['message'],
+            computed: {
+                className() {
+                    return `message-${this.message.id}`
+                }
+            },
+            mounted() {
+                document.querySelectorAll('li')[document.querySelectorAll('li').length - 1].scrollIntoView()
+            }
+        })
+
+        var app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    roomId: '605964',
+                    tips: '',
+                    messageList: [],
+                    messageListHeight: 'auto',
+                    room: null,
+                    closed: null,
+                    isClosed: true,
+                    gift: {},
+                    fetchGift: null,
+                    intervalFetchGift: 15 * 60 * 1000,
+                    url: 'https://flxxyz.github.io/douyudm/example/web/host.json',
+                    douyuUrl: '',
+                    giftUrl: '',
+                    debug: true,
+                }
+            },
+            methods: {
+                enter: function () {
+                    var txt = ''
+                    if (this.roomId && this.roomId > 0) {
+                        console.log('enter', this.roomId)
+
+                        //等待链接关闭再连接
+                        if (this.closed) {
+                            if (this.room) {
+                                this.room.logout()
+                            }
+                            return;
+                        }
+
+                        if (this.isClosed) {
+                            this.start(this.roomId)
+                        }
+
+                        this.closed = setInterval(() => {
+                            if (this.room.ws.socket.readyState === 3) {
+                                clearInterval(this.fetchGift)
+                                this.start(this.roomId)
+                            }
+                        }, 5)
+                    } else {
+                        txt = '请输入正确的房间号'
+                    }
+                    this.tips = txt
+                },
+                start: function (id) {
+                    this.fetchGift = setInterval(() => {
+                        this.httpGet(`${this.douyuUrl}/api/RoomApi/room/${this.roomId}`, roomInfo => {
+                            var addGift = []
+                            var roomGift = roomInfo.data.gift.reduce((previous, curr, index) => {
+                                addGift.push({
+                                    id: curr.id,
+                                    name: curr.name
+                                })
+                                previous[curr.id] = curr.name
+                                return previous
+                            }, {})
+                            console.log(addGift)
+                            this.gift = Object.assign(this.gift, roomGift)
+                            this.httpPost(this.giftUrl, {
+                                body: JSON.stringify(addGift),
+                                method: 'POST',
+                                headers: {
+                                    'user-agent': 'github flxxyz/douyudm',
+                                    'content-type': 'application/json'
+                                },
+                            }, data => {
+                                console.log(data)
+                            })
+                        })
+                    }, this.intervalFetchGift)
+                    this.isClosed = true
+                    this.messageList = []
+                    var echo = this.echo
+                    this.room = new danmaku(id, { debug: this.debug })
+                    this.room.on('connect', () => {
+                        echo(`[connect] roomId=${id}`)
+                    })
+                    this.room.on('disconnect', () => {
+                        echo(`[disconnect] roomId=${id}`)
+                    })
+                    this.room.on('error', err => {
+                        echo(`[error] roomId=${id} ${err}`)
+                    })
+                    this.room.on('uenter', function (res) {
+                        echo(`[uenter] ${res.nn}进入房间`)
+                    })
+                    this.room.on('chatmsg', function (res) {
+                        echo(`[chatmsg] <lv ${res.level}> [${res.nn}] ${res.txt}`)
+                    })
+                    this.room.on('dgb', res => {
+                        var gf = this.gift[res.gfid] || '未知礼物'
+                        echo(`[dgb] 感谢${res.nn}送出${gf}  礼物id=${res.gfid}`)
+                    })
+                    this.room.run()
+                    this.isClosed = false
+                },
+                close: function () {
+                    if (this.room) {
+                        this.room.logout()
+                        clearInterval(this.closed)
+                        clearInterval(this.fetchGift)
+                        this.closed = null
+                        this.isClosed = true
+                    }
+                },
+                resize: function () {
+                    console.log('onresize')
+                    this.messageListHeight = (document.documentElement.clientHeight - 60) + 'px'
+                    var li = document.querySelectorAll('li')
+                    var liLast = li[li.length - 1]
+                    if (typeof liLast !== 'undefined') {
+                        liLast.scrollIntoView()
+                    }
+                },
+                echo: function (message) {
+                    console.log(message)
+                    this.messageList.push({
+                        id: this.uuid(),
+                        content: message,
+                    })
+                },
+                uuid: function () {
+                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                        let r = Math.random() * 16 | 0,
+                            v = c == 'x' ? r : r & 0x3 | 0x8;
+                        return v.toString(16);
+                    });
+                },
+                httpGet: function (url, callback) {
+                    this.httpPost(url, { method: 'GET' }, callback)
+                },
+                httpPost: function (url, opts, callback) {
+                    console.log('[fetch]', url)
+                    fetch(url, opts)
+                        .then(res => res.json())
+                        .then(data => callback(data))
+                },
+                clear: function () {
+                    this.messageList = []
+                },
+                loggerExport: function () {
+                    if (this.roomId && this.roomId > 0) {
+                        this.room.logger.export(this.roomId)
+                    }
+                },
+                loggerClear: function () {
+                    if (this.roomId && this.roomId > 0) {
+                        this.room.logger.clear(this.roomId)
+                    }
+                }
+            },
+            computed: {
+                isDebug() {
+                    if (!this.isClosed && this.debug) {
+                        return true
+                    }
+                    return false
+                }
+            },
+            created() {
+                this.httpGet(this.url, data => {
+                    this.douyuUrl = data.douyu
+                    this.giftUrl = `${data.gift}?channel=douyu`
+                    this.httpGet(this.giftUrl, data => {
+                        if (Array.isArray(data.data)) data.data = {}
+                        this.gift = Object.assign(this.gift, data.data)
+
+                    })
+                })
+            },
+            mounted() {
+                this.resize()
+                window.onresize = this.resize
+            },
+            destroyed() {
+                clearInterval(this.closed)
+                clearInterval(this.fetchGift)
+            }
+        })
+    </script>
+</body>
+
+</html>

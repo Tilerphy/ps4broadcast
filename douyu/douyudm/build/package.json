@@ -1,0 +1,28 @@
+{
+  "scripts": {
+    "build": "npx webpack --env prod --mode production --config ./config/index.js --colors --progress",
+    "dev": "npx webpack --env dev --mode development --config ./config/index.js --colors --progress --display-reasons --display-modules"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.10.1",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.6",
+    "@babel/plugin-transform-async-to-generator": "^7.8.3",
+    "@babel/plugin-transform-exponentiation-operator": "^7.8.3",
+    "@babel/plugin-transform-for-of": "^7.9.0",
+    "@babel/plugin-transform-parameters": "^7.9.5",
+    "@babel/plugin-transform-property-literals": "^7.8.3",
+    "@babel/preset-env": "^7.8.7",
+    "babel-loader": "^8.0.6",
+    "babel-plugin-minify-constant-folding": "^0.5.0",
+    "babel-plugin-minify-dead-code-elimination": "^0.5.1",
+    "babel-plugin-minify-guarded-expressions": "^0.4.4",
+    "babel-plugin-minify-mangle-names": "^0.5.0",
+    "babel-plugin-minify-numeric-literals": "^0.4.3",
+    "babel-plugin-minify-simplify": "^0.5.1",
+    "babel-plugin-minify-type-constructors": "^0.4.3",
+    "babel-plugin-transform-remove-console": "^6.9.4",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
+  }
+}
