@@ -83,7 +83,6 @@ sudo make && sudo make install
 ```
 cd /ps4broadcast/ps4broadcast
 sudo chmod 777 install.sh
-sudo chmod 777 start.sh
 sudo chmod 777 start-web.sh
 
 ```
@@ -116,7 +115,7 @@ sudo npm install
 ```
 cd /ps4broadcast/ps4broadcast
 
-sudo ./start-web eth0
+sudo ./start-web.sh eth0
 
 ```
 

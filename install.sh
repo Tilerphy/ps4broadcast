@@ -3,15 +3,15 @@ echo "install the required software......"
 apt-get update
 apt-get install -y git libpcre3-dev nodejs openssl libssl-dev gcc g++ automake zlib1g-dev make psmisc
 echo "download nginx......"
-wget http://nginx.org/download/nginx-1.12.1.tar.gz
-tar -xvf nginx-1.12.1.tar.gz
-cd nginx-1.12.1
+wget http://nginx.org/download/nginx-1.18.0.tar.gz
+tar -xvf nginx-1.18.0.tar.gz
+cd nginx-1.18.0
 echo "clone nginx-rtmp-module from Github.........."
 git clone https://github.com/Tilerphy/nginx-rtmp-module.git
 echo "Complile nginx with rtmp-module....................."
 ./configure --prefix=/usr/local/nginx/ --add-module=./nginx-rtmp-module
 echo "Install nginx to /usr/local/nginx..................."
-make
+make CFLAGS='-Wno-implicit-fallthrough'
 make install
 #echo "Install nodejs.."
 #wget https://nodejs.org/dist/v8.7.0/node-v8.7.0.tar.gz
