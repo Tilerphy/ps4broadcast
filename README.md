@@ -1,6 +1,9 @@
 [![Gitter](https://img.shields.io/gitter/room/tilerphy/ps4broadcast.svg)](https://gitter.im/ghost-studio/ps4broadcast)
-# 小道消息
+# 确切测试
 PS5、XBOX Series X依然支持rtmp方式直播，所以ps4broadcast也支持PS5和XBOX Series X（XBOX无弹幕支持）。
+
+PS5上使用ps4broadcast的效果非常好，自带录像功能也支持了1080p@60fps，并且PS5与PS4的弹幕重定向功能是相同协议，所以弹幕也支持。
+
 # 前言
 鉴于PS4暂时没有直播到国内直播平台的功能，所以用了一些手段拦截twitch的RTMP内容与IRC聊天室内容，并且转发到斗鱼（将来可能会增加其他的国内直播平台。）
 另外，这只是个折中手段，没准过几天PS4官方支持国内的直播平台推流了，起码国行机器是有这个可能的，这个谁说的准呢？所以这个方案只是个临时的，没有办法的办法。
@@ -80,7 +83,6 @@ sudo make && sudo make install
 ```
 cd /ps4broadcast/ps4broadcast
 sudo chmod 777 install.sh
-sudo chmod 777 start.sh
 sudo chmod 777 start-web.sh
 
 ```
@@ -113,7 +115,7 @@ sudo npm install
 ```
 cd /ps4broadcast/ps4broadcast
 
-sudo ./start-web eth0
+sudo ./start-web.sh eth0
 
 ```
 
