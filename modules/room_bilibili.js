@@ -61,6 +61,7 @@ function popBilibiliMsg(d, callback){
 	}
 	var version = d[6]<<8 | d[7];
 	var action = d[8]|d[9]|d[10]|d[11];
+	console.log(action);
        	if(callback && d[11]!= 3 && d[11]!= 8){
        		var length = d[0]*256*256*256+d[1]*256*256+d[2]*256+d[3];
 		//resolve bilibili TCP-nagle bug
@@ -79,13 +80,39 @@ function popBilibiliMsg(d, callback){
                 	}
 		}else{
 			if(action==5){
-				var newLength = d[0]|d[1]|d[2]|d[3];
                 		inflate(d.slice(16), (er4, newD)=>{
 					if(er4){
 						console.log(er4);
 					}else{
-						console.log(newD.toString().slice(16));
-                        			callback(JSON.parse(newD.toString().slice(16)));
+						_msg = newD.toString().slice(16);
+						console.log(_msg);
+						sta = [];
+						tmpSentence = "";
+						reloop = true;
+						for(var index=0;index<_msg.length; index++){
+							if (_msg[index] == '{'){
+								reloop = false;
+								sta.push("{");
+								tmpSentence = tmpSentence+_msg[index];
+							}
+							else if(_msg[index] == '}'){
+								sta.pop();
+								tmpSentence = tmpSentence+_msg[index];
+							}
+							else{
+								if(sta.length == 0){
+									//ignore
+								}else{
+									tmpSentence = tmpSentence+_msg[index];
+								}
+							}
+							if(sta.length == 0 && !reloop ){
+								console.log("#"+tmpSentence);
+								callback(JSON.parse(tmpSentence));
+								tmpSentence="";
+								reloop = true;
+							}
+						}
 					}
 				});
 			}
