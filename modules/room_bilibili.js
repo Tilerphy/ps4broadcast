@@ -37,8 +37,8 @@ var init = function (rid, io, lp){
         });
 
         var dataBuffer  = Buffer.from("{\"roomid\":"+this.rid+",\"uid\":"+this.uid+"}");
-        var headerBuffer= new Buffer([0,0,0,dataBuffer.length+16,0,16,0,1,0,0,0,7,0,0,0,1]);
-      	var heartBeat = new Buffer([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]);
+        var headerBuffer= Buffer.from([0,0,0,dataBuffer.length+16,0,16,0,1,0,0,0,7,0,0,0,1]);
+      	var heartBeat = Buffer.from([0,0,0,16,0,16,0,1,0,0,0,2,0,0,0,1]);
       	var packageBuffer = Buffer.alloc(dataBuffer.length+headerBuffer.length);
         packageBuffer = Buffer.concat([headerBuffer,dataBuffer]);
        	var p = new Promise((resolve, reject)=>{
@@ -85,7 +85,7 @@ function popBilibiliMsg(d, callback){
 						console.log(er4);
 					}else{
 						_msg = newD.toString().slice(16);
-						console.log(_msg);
+						//console.log(_msg);
 						sta = [];
 						tmpSentence = "";
 						reloop = true;
@@ -107,7 +107,7 @@ function popBilibiliMsg(d, callback){
 								}
 							}
 							if(sta.length == 0 && !reloop ){
-								console.log("#"+tmpSentence);
+								//console.log("#"+tmpSentence);
 								callback(JSON.parse(tmpSentence));
 								tmpSentence="";
 								reloop = true;
