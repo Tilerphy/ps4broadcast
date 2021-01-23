@@ -15,6 +15,7 @@ var port = 6667;
 var modules = [];
 var roomModules ={};
 var moduleFiles = fs.readdirSync(__dirname+"/modules");
+var _timerHandlers = [];
 for(var mf of moduleFiles){
         if(mf.indexOf("_") == 0){
                 console.log(mf+" is loaded.");
@@ -53,14 +54,23 @@ process.on('uncaughtException', function (err) {
 var Client = function(tid, sock){
         this.sock = sock;
         this.tid = tid;
+	this.pinger = -1;
+	this.setPinger = (p)=>{
+		this.pinger = p;
+	};
+	this.close = ()=>{
+		clearInterval(this.pinger);
+	};
         this.toPS4 = (name, message)=>{
                try{
                         this.sock.write(":"+name+"!"+name+"@"+name+".tmi.twitch.tv PRIVMSG #"+name+" :"+message+"\r\n");
-                        this.sock.write("\r\n");
+                        //this.sock.write("\r\n");
                 }catch(e){
 
                 }
         };
+
+	
         this.sendHandshake =  ()=>{
                 try{
                         this.sock.write(":tmi.twitch.tv 001 "+this.tid+" :Welcome, GLHF!\r\n");
@@ -76,6 +86,23 @@ var Client = function(tid, sock){
 			console.log("handshake sent faild.");
                 }
         };
+	this.sendPing = ()=>{
+		try{
+                        this.sock.write("PING :tmi.twitch.tv\r\n");
+                        //this.sock.write("\r\n");
+			console.log("sent a PING to client.");
+                }catch(e){
+                        console.log("failed to send ping.");
+                }
+	};
+	this.sendCAP = ()=>{
+		try{
+			this.sock.write(":tmi.twitch.tv CAP * ACK :twitch.tv/tags\r\n");
+                        //this.sock.write("\r\n");
+		}catch(e){
+			console.log("failed to send cap.");
+		}
+	};
 }
 
 var lp = null;
@@ -99,7 +126,13 @@ io.on("connection", (websock)=>{
                 websock.emit("lastState", JSON.parse(fs.readFileSync(__dirname+"/lp.data")));
         }
         websock.on("resetlive", (msg)=>{
-                        if(lp && lp.server.listening){
+                        if(_timerHandlers.length > 0){
+				for(var handler of _timerHandlers){
+					clearInterval(handler);
+				}
+				_timerHandlers = [];
+			}
+			if(lp && lp.server.listening){
                                 lp.server.close();
                         }
 
@@ -121,7 +154,8 @@ io.on("connection", (websock)=>{
                           .then(lp.start())
                           .then(()=>{
                                 io.emit("living", msg.items.length + " channels.");
-                        }).catch(()=>{
+                        })
+			.catch(()=>{
                                 io.emit("living", false);
                         });
         });
@@ -190,18 +224,25 @@ var LivingProcess = function(tid, items){
         this.configTwitchClient = ()=>{
                 return new Promise((resolve, reject)=>{
                         this.server = net.createServer((sock)=>{
-                                console.log("connected");
+            			console.log("connected");
                                 this.currentTwitchClient = new Client(this.tid, sock);
                                 sock.on("data", (d)=>{
                                         var message = d.toString();
                                         console.log("Console said: "+message);
+					if(message.indexOf("CAP REQ") == 0){
+						this.currentTwitchClient.sendCAP();
+					}
                                         if(message.indexOf("NICK") == 0 || message.indexOf(" PASS")==0){
                                                 this.currentTwitchClient.sendHandshake();
                                         }
                                 });
                                 sock.on("close", ()=>{
+					this.currentTwitchClient.close();
                                         console.log("closed");
                                 });
+				_handler = setInterval(this.currentTwitchClient.sendPing, 15*1000);
+				_timerHandlers.push(_handler);
+				this.currentTwitchClient.setPinger(_handler);
                         });
                         try{
                                 this.server.listen(port, host);
