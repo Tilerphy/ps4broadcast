@@ -41,8 +41,8 @@ iptables -t mangle -A V2RAY_MASK -d 255.255.255.255/32 -j RETURN
 iptables -t mangle -A V2RAY_MASK -d 192.168.0.0/16 -p tcp -j RETURN # 
 iptables -t mangle -A V2RAY_MASK -d 192.168.0.0/16 -p udp ! --dport 53 -j RETURN 
 iptables -t mangle -A V2RAY_MASK -j RETURN -m mark --mark 0xff    # 直连 SO_MARK 为 0xff 的流量(0xff 是 16 进制数，数值上等同与上面V2Ray 配置的 255)
-iptables -t mangle -A V2RAY_MASK -p udp -j MARK --set-mark 1  
-iptables -t mangle -A V2RAY_MASK -p tcp -j MARK --set-mark 1  
+#iptables -t mangle -A V2RAY_MASK -p udp -j MARK --set-mark 1  
+#iptables -t mangle -A V2RAY_MASK -p tcp -j MARK --set-mark 1  
 iptables -t mangle -A OUTPUT -j V2RAY_MASK 
 
 node $basepath/start.js
