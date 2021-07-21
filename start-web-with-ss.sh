@@ -4,6 +4,8 @@ cd $basepath
 mkdir node_modules
 cp -R ./douyu/* node_modules
 iptables -t nat -F
+#set max file s
+ulimit -n 10240
 # 设置策略路由
 ip rule add fwmark 1 table 100
 ip route add local 0.0.0.0/0 dev lo table 100
