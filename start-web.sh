@@ -1,7 +1,7 @@
 #!/bin/sh
 basepath=$(cd `dirname $0`; pwd)
 cd $basepath
-mkdir node_modules
+mkdir -p node_modules
 cp -R ./douyu/* node_modules
 iptables -t nat -F
 #ip route add local default dev lo table 100
@@ -15,5 +15,7 @@ iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 1935 -j DNAT --
 iptables -t nat -A PREROUTING -p tcp -s 192.168.200.0/24 --dport 6667 -j DNAT --to-destination  192.168.200.1:6667
 #iptables -t nat -A PREROUTING --ipv4 -s 192.168.200.0/24 -p tcp -j DNAT --to-destination 192.168.200.1:20000
 #iptables -t mangle -A PREROUTING -p udp -j TPROXY --on-port 20000 --tproxy-mark 0x01/0x01
+iptables -t filter -A FORWARD -s 192.168.200.0/24 -j ACCEPT
+iptables -t filter -A FORWARD -d 192.168.200.0/24 -j ACCEPT
 iptables -t nat -A POSTROUTING --ipv4 -j MASQUERADE
 node $basepath/start.js
