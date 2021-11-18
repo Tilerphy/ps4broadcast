@@ -1,8 +1,14 @@
 [![Gitter](https://img.shields.io/gitter/room/tilerphy/ps4broadcast.svg)](https://gitter.im/ghost-studio/ps4broadcast)
+# 我们是索狗qq群
+
+如果希望讨论游戏，我们有一个qq群： 855457801
+当然，不论xbox、ps、switch、pc或者其他游戏平台，都可以进群聊啊，游戏才是我们共同的、永久的话题。
+
 # 确切测试
 PS5、XBOX Series X依然支持rtmp方式直播，所以ps4broadcast也支持PS5和XBOX Series X（XBOX无弹幕支持）。
 
 PS5上使用ps4broadcast的效果非常好，自带录像功能也支持了1080p@60fps，并且PS5与PS4的弹幕重定向功能是相同协议，所以弹幕也支持。
+
 
 # 前言
 鉴于PS4暂时没有直播到国内直播平台的功能，所以用了一些手段拦截twitch的RTMP内容与IRC聊天室内容，并且转发到斗鱼（将来可能会增加其他的国内直播平台。）
