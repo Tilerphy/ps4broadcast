@@ -1,4 +1,16 @@
 [![Gitter](https://img.shields.io/gitter/room/tilerphy/ps4broadcast.svg)](https://gitter.im/ghost-studio/ps4broadcast)
+# 增加对openwrt中uu插件的支持。
+
+环境： 运行ps4broadcast的机器， 一个openwrt路由器运行了uu插件，ps4\ps5 的网关设置为openwrt，要求openwrt路由器能通过ip访问到ps4broadcast，方式不限。
+设置方法：
+1. 为openwrt安装python3
+3. 将coverUU.py 复制到openwrt的某一个路径下，我们假设为/app/coverUU.py
+4. 修改coverUU.py中的192.168.8.11到你运行ps4broadcast的机器的ip
+5. 修改openwrt的/etc/rc.local ，在exit 0之前增加一行语句： /usr/bin/python /app/coverUU.py & 
+6. 别省略上一行的 &
+7. 重启openwrt
+8. 这之后，就可以在uu同时使用ps4broadcast进行直播了。
+
 # 我们是索狗qq群
 
 如果希望讨论游戏，我们有一个qq群： 855457801
