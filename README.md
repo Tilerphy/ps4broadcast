@@ -11,6 +11,9 @@
 7. 重启openwrt
 8. 这之后，就可以在uu同时使用ps4broadcast进行直播了。
 
+目前的流程如下：
+![](https://raw.githubusercontent.com/Tilerphy/ps4broadcast/master/PS4broadcast%20now.drawio.png)
+
 # 我们是索狗qq群
 
 如果希望讨论游戏，我们有一个qq群： 855457801
