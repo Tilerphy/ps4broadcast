@@ -1,7 +1,15 @@
 [![Gitter](https://img.shields.io/gitter/room/tilerphy/ps4broadcast.svg)](https://gitter.im/ghost-studio/ps4broadcast)
 # 增加对openwrt中uu插件的支持。
 
-环境： 运行ps4broadcast的机器， 一个openwrt路由器运行了uu插件，ps4\ps5 的网关设置为openwrt，要求openwrt路由器能通过ip访问到ps4broadcast，方式不限。
+环境： 
+
+运行ps4broadcast的机器， 
+
+一个openwrt路由器运行了uu插件，
+
+ps4\ps5 的网关设置为openwrt，要求openwrt路由器能通过ip访问到ps4broadcast，方式不限。
+
+
 设置方法：
 1. 为openwrt安装python3
 3. 将coverUU.py 复制到openwrt的某一个路径下，我们假设为/app/coverUU.py
