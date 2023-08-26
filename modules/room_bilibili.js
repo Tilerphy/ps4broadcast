@@ -4,28 +4,45 @@ const { deflate, unzip,inflate } = require('zlib');
 
 var buvidString  = "";
 var buvid ="";
-xhttps.get('https://api.bilibili.com/x/frontend/finger/spi', (response) => {
-        response.on("data", (d)=>{
-                buvidString += d;
-        });
+//xhttps.get('https://api.bilibili.com/x/frontend/finger/spi', (response) => {
+//      response.on("data", (d)=>{
+//              buvidString += d;
+//      });
+//
+//      response.on('end', () => {
+//              var buvidObj = JSON.parse(buvidString);
+//              buvid = buvidObj["data"]["b_3"];
+//              console.log("buvid is "+ buvid);
+//      });
+//
+//});
 
-        response.on('end', () => {
-                var buvidObj = JSON.parse(buvidString);
-                buvid = buvidObj["data"]["b_3"];
-                console.log("buvid is "+ buvid);
-        });
+var init = function(rid, io, lp){
+                xhttps.get('https://api.bilibili.com/x/frontend/finger/spi', (response) => {
+                        response.on("data", (d)=>{
+                                buvidString += d;
+                        });
 
-});
+                        response.on('end', () => {
+                                var buvidObj = JSON.parse(buvidString);
+                                buvid = buvidObj["data"]["b_3"];
+                                console.log("buvid is "+ buvid);
+                                initx(rid, io, lp);
+                        });
 
+                });
+}
 
-var init = function (rid, io, lp){
+var initx = function (rid, io, lp){
         this.uid = 123456789012345 + parseInt(1000000000000000*Math.random());
         this.rid = rid;
         this.lp = lp;
         this.interval = null;
+
         var sock = net.connect(80, "broadcastlv.chat.bilibili.com");
         sock.on("connect", ()=>{
                 console.log("connected");
+
         });
         sock.on("data", (d)=>{
                 console.log(d);
@@ -66,6 +83,8 @@ var init = function (rid, io, lp){
                         resolve();
                 });
         });
+
+
         this.close = ()=>{
                 clearInterval(this.interval);
                 sock.destroy();
